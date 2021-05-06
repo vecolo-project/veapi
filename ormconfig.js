@@ -5,7 +5,7 @@ const config =
     : require('./src/config').default;
 
 const srcConfig = {
-  type: 'mongodb',
+  type: 'mysql',
   url: config.databaseURL,
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -18,7 +18,7 @@ const srcConfig = {
 };
 
 const distConfig = {
-  type: 'mongodb',
+  type: 'mysql',
   url: config.databaseURL,
   useNewUrlParser: true,
   useUnifiedTopology: true,

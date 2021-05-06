@@ -1,7 +1,6 @@
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import { Application, NextFunction, Request, Response } from 'express';
+import { Application, NextFunction, Request, Response, json } from 'express';
 import apiRoutes from '../api/routes';
 import Logger from '../logger';
 import config from '../config';
@@ -26,7 +25,7 @@ export default (app: Application): void => {
   app.use(helmet());
 
   // Middleware that transforms the raw string of req.body into json
-  app.use(bodyParser.json());
+  app.use(json());
 
   // Load API routes
   app.use(`/${config.endpointPrefix}`, apiRoutes);

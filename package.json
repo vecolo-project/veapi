@@ -7,7 +7,6 @@
     "start": "node dist/app.js",
     "build": "tsc -p .",
     "dev": "nodemon -V --exec ts-node src/app.ts",
-    "mongodb": "mkdirp .mongodb && mongod --dbpath .mongodb",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "cross-env NODE_ENV=test TS_NODE=true jest --runInBand",
@@ -30,22 +29,20 @@
     "express",
     "typeorm",
     "typedi",
-    "boilerplate",
     "api",
     "rest",
     "jest",
     "validation",
-    "mongodb"
+    "mariaDB"
   ],
-  "author": "Brian Min <bymi15@yahoo.com>",
+  "author": "Vécolo",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bymi15/express-typeorm-rest-boilerplate/issues"
+    "url": "https://github.com/vecolo-project/API"
   },
-  "homepage": "https://github.com/bymi15/express-typeorm-rest-boilerplate#readme",
+  "homepage": "https://github.com/vecolo-project/API",
   "dependencies": {
     "bcrypt": "^5.0.0",
-    "body-parser": "^1.19.0",
     "celebrate": "^13.0.3",
     "class-validator": "^0.12.2",
     "cors": "^2.8.5",
@@ -56,7 +53,7 @@
     "helmet": "^4.1.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
-    "mongodb": "^3.6.2",
+    "mysql2": "^2.2.5",
     "reflect-metadata": "^0.1.13",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.26",
@@ -82,7 +79,7 @@
     "cross-env": "^7.0.2",
     "eslint": "^7.9.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-prettier": "^3.1.4",
     "faker": "^5.1.0",
     "jest": "^26.4.2",
