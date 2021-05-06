@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - '11.14.0'
+install:
+  - npm install
+env:
+  - MONGODB_URI="mongodb://127.0.0.1/express-typeorm-rest-boilerplate" MONGODB_TEST_URI="mongodb://127.0.0.1/express-typeorm-rest-boilerplate-test" LOG_LEVEL="debug" PORT=3000
+services:
+  - mongodb
+before_script:
+  - sleep 10
+script:
+  - npm run lint
+  - npm run test
+  - npm run build
+  - npm run semantic-release
+notifications:
+  email: false
