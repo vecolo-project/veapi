@@ -2,7 +2,7 @@ import { User, Role } from '../../api/entities/User';
 import bcrypt from 'bcrypt';
 import * as faker from 'faker';
 
-export default async (data?: User): Promise<User> => {
+export default async (data?: Partial<User>): Promise<User> => {
   let password = await bcrypt.hash(faker.random.word(), 12);
   if (data && data.password) {
     password = await bcrypt.hash(data.password, 12);

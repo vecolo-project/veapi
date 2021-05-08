@@ -19,13 +19,13 @@ describe('AuthRoute', () => {
     Container.set('logger', Logger);
     connection = getConnection();
     userSeed = new EntitySeed<User>(
-      connection.getMongoRepository(User),
+      connection.getRepository(User),
       UserFactory
     );
   });
 
   beforeEach(async () => {
-    await connection.dropDatabase();
+    // await connection.dropDatabase();
   });
 
   afterAll(async () => {
@@ -37,6 +37,7 @@ describe('AuthRoute', () => {
   describe('register', () => {
     it('should create a new user', async () => {
       const mockUser = await UserFactory();
+      console.log(mockUser);
       const res = await request.post('/api/auth/register').send({
         firstName: mockUser.firstName,
         lastName: mockUser.lastName,
