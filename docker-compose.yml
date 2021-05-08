@@ -2,11 +2,14 @@ version: '3'
 services:
   db:
     image: mariadb
+    restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=vecolo
     volumes:
       - ./database:/var/lib/mysql
+    ports:
+      - 3306:3306
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
