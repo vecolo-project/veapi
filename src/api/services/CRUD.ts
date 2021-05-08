@@ -64,7 +64,7 @@ export default class CRUD<Entity> {
     throw new ErrorHandler(404, 'Not found');
   }
 
-  async findOne(id: string): Promise<Entity | undefined> {
+  async findOne(id: number): Promise<Entity | undefined> {
     const entity = await this.repo.findOne(id);
     if (entity) {
       return entity;
@@ -72,7 +72,7 @@ export default class CRUD<Entity> {
     throw new ErrorHandler(404, 'Not found');
   }
 
-  async update(id: string, updatedFields: ObjectLiteral): Promise<Entity> {
+  async update(id: number, updatedFields: ObjectLiteral): Promise<Entity> {
     const entity = await this.repo.findOne(id);
     if (!entity) {
       throw new ErrorHandler(404, 'Not found');

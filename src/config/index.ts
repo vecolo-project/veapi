@@ -33,6 +33,21 @@ if (process.env.NODE_ENV === 'development') {
     },
     endpointPrefix: 'api',
   };
+} else if (process.env.NODE_ENV === 'test') {
+  config = {
+    port: 4562,
+    jwtSecret: 'vécolo JWT secret',
+    dbUser: 'root',
+    dbPassword: 'root',
+    dbSchema: 'vecolo_test',
+    dbPort: 3306,
+    dbType: 'mariadb',
+    dbHost: 'localhost',
+    logs: {
+      level: 'debug',
+    },
+    endpointPrefix: 'api',
+  };
 } else {
   config = {
     port: process.env.PORT || 8000,
