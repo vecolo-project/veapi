@@ -12,7 +12,8 @@ export default async (data?: User): Promise<User> => {
     'staff',
     'admin',
   ]);
-  const user = new User({
+
+  const user = User.create({
     firstName: (data && data.firstName) || faker.name.firstName(),
     lastName: (data && data.lastName) || faker.name.lastName(),
     email: (data && data.email) || faker.internet.email(),

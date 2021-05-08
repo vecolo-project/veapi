@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { MongoRepository, ObjectLiteral } from 'typeorm';
+import { ObjectLiteral, Repository } from 'typeorm';
 import { Logger } from 'winston';
 import { validate } from 'class-validator';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
@@ -7,15 +7,15 @@ import _ from 'lodash';
 
 @Service()
 export default class CRUD<Entity> {
-  protected repo: MongoRepository<Entity>;
+  protected repo: Repository<Entity>;
   protected logger: Logger;
 
-  constructor(repo: MongoRepository<Entity>, logger: Logger) {
+  constructor(repo: Repository<Entity>, logger: Logger) {
     this.repo = repo;
     this.logger = logger;
   }
 
-  getRepo(): MongoRepository<Entity> {
+  getRepo(): Repository<Entity> {
     return this.repo;
   }
 

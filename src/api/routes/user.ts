@@ -23,10 +23,10 @@ route.get(
   }
 );
 
-route.get('/current', isAuth, attachUser, (req: Request, res: Response) => {
-  const logger: Logger = Container.get('logger');
-  logger.debug('Calling GET /user/current endpoint');
-  return res.json({ user: req.currentUser }).status(200);
-});
+// route.get('/current', isAuth, attachUser, (req: Request, res: Response) => {
+//   const logger: Logger = Container.get('logger');
+//   logger.debug('Calling GET /user/current endpoint');
+//   return res.json({ user: req.currentUser }).status(200);
+// });
 
 export default route;
