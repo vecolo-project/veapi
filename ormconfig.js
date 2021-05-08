@@ -5,8 +5,12 @@ const config =
     : require('./src/config').default;
 
 const srcConfig = {
-  type: 'mysql',
-  url: config.databaseURL,
+  type: config.dbType,
+  host: config.dbHost,
+  port: config.dbPort,
+  database: config.dbSchema,
+  username: config.dbUser,
+  password: config.dbPassword,
   useNewUrlParser: true,
   useUnifiedTopology: true,
   synchronize: true,
@@ -18,8 +22,12 @@ const srcConfig = {
 };
 
 const distConfig = {
-  type: 'mysql',
-  url: config.databaseURL,
+  type: config.dbType,
+  host: config.dbHost,
+  port: config.dbPort,
+  database: config.dbSchema,
+  username: config.dbUser,
+  password: config.dbPassword,
   useNewUrlParser: true,
   useUnifiedTopology: true,
   synchronize: false,
