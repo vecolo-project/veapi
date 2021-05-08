@@ -4,7 +4,7 @@
   "description": "Boilerplate code to get started with building RESTful API Services",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "cross-env NODE_ENV=production node dist/app.js",
     "build": "tsc -p .",
     "dev": "nodemon -V --exec ts-node src/app.ts",
     "lint": "eslint .",
