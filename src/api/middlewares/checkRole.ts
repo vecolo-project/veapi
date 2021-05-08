@@ -1,11 +1,12 @@
 import { Container } from 'typedi';
 import { Logger } from 'winston';
-import { Response, NextFunction, Request, RequestHandler } from 'express';
+import { Response, NextFunction, RequestHandler } from 'express';
 import { User, Role } from '../entities/User';
 import UserService from '../services/UserService';
+import { userRequest } from '../../types/userRequest';
 
 const checkRole = (role: Role): RequestHandler => async (
-  req: Request,
+  req: userRequest,
   res: Response,
   next: NextFunction
 ): Promise<unknown> => {

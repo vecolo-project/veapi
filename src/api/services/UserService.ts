@@ -2,11 +2,14 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 import { Inject, Service } from 'typedi';
-import { User } from '../entities/User';
-import { MongoRepository } from 'typeorm';
+import {
+  User,
+  userCreationProps,
+  UserRepository,
+  UserResponse,
+} from '../entities/User';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
-import { IUserInputDTO, IUserResponseDTO } from '../../types';
 import { validate } from 'class-validator';
 import CRUD from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
@@ -15,24 +18,24 @@ import { ErrorHandler } from '../../helpers/ErrorHandler';
 export default class UserService extends CRUD<User> {
   constructor(
     @InjectRepository(User)
-    protected userRepo: MongoRepository<User>,
+    protected userRepo: UserRepository,
     @Inject('logger')
     protected logger: Logger
   ) {
     super(userRepo, logger);
   }
 
-  getRepo(): MongoRepository<User> {
+  getRepo(): UserRepository {
     return this.userRepo;
   }
 
-  async register(userInputDTO: IUserInputDTO): Promise<IUserResponseDTO> {
+  async register(userInput: userCreationProps): Promise<UserResponse> {
     this.logger.debug('Registering user...');
-    const hashedPassword = await bcrypt.hash(userInputDTO.password, 12);
-    const newUser = new User({
-      firstName: userInputDTO.firstName,
-      lastName: userInputDTO.lastName,
-      email: userInputDTO.email,
+    const hashedPassword = await bcrypt.hash(userInput.password, 12);
+    const newUser = User.create({
+      firstName: userInput.firstName,
+      lastName: userInput.lastName,
+      email: userInput.email,
       password: hashedPassword,
     });
     const errors = await validate(newUser, {
@@ -53,7 +56,7 @@ export default class UserService extends CRUD<User> {
     return { user, token };
   }
 
-  async login(email: string, password: string): Promise<IUserResponseDTO> {
+  async login(email: string, password: string): Promise<UserResponse> {
     this.logger.debug('Authenticating user...');
     const userRecord = await this.userRepo.findOne({ email });
     if (!userRecord) throw new ErrorHandler(401, 'Invalid email or password');
