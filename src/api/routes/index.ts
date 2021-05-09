@@ -9,7 +9,7 @@ const routes = Router();
  * @openapi
  * /:
  *   get:
- *     description: Welcome to Vécolo API
+ *     description: Welcome to swagger-jsdoc!
  *     responses:
  *       200:
  *         description: Returns a mysterious string.

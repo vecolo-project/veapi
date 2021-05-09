@@ -6,8 +6,15 @@ import UserService from '../services/UserService';
 import { userRequest } from '../../types/userRequest';
 
 const route = Router();
+
 /**
- *
+ * @openapi
+ * /user:
+ *   get:
+ *     description: GET all users
+ *     responses:
+ *       200:
+ *         description: Returns all the users.
  */
 route.get(
   '/',
@@ -26,6 +33,15 @@ route.get(
   }
 );
 
+/**
+ * @openapi
+ * /user/current:
+ *   get:
+ *     description: GET the current user
+ *     responses:
+ *       200:
+ *         description: Retrun the user who made the request
+ */
 route.get('/current', isAuth, attachUser, (req: userRequest, res: Response) => {
   const logger: Logger = Container.get('logger');
   logger.debug('Calling GET /user/current endpoint');
