@@ -4,13 +4,14 @@ import { Container } from 'typedi';
 import { isAuth, attachUser, checkRole } from '../middlewares';
 import UserService from '../services/UserService';
 import { userRequest } from '../../types/userRequest';
+import { Role } from '../entities/User';
 
 const route = Router();
 
 route.get(
   '/',
   isAuth,
-  checkRole('admin'),
+  checkRole(Role.ADMIN),
   async (req: Request, res: Response, next: NextFunction) => {
     const logger: Logger = Container.get('logger');
     logger.debug('Calling GET /user endpoint');
