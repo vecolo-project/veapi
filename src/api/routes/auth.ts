@@ -71,7 +71,6 @@ route.post(
  *    post:
  *     description: Login to the application
  *     parameters:
- *     - in: "body"
  *         name: body
  *         required: true
  *         schema:
