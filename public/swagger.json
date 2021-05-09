@@ -1,0 +1,29 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "express-typeorm-rest-boilerplate",
+		"version": "0.4.2",
+		"description": "Boilerplate code to get started with building RESTful API Services",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "Vécolo"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

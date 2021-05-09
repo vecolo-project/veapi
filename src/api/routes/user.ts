@@ -6,7 +6,9 @@ import UserService from '../services/UserService';
 import { userRequest } from '../../types/userRequest';
 
 const route = Router();
-
+/**
+ *
+ */
 route.get(
   '/',
   isAuth,
