@@ -32,6 +32,6 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
-route.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+route.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 export default route;

@@ -3,11 +3,9 @@ import { Container } from 'typedi';
 import { celebrate, Joi } from 'celebrate';
 import UserService from '../services/UserService';
 import { Logger } from 'winston';
-import { Post } from '@tsoa/runtime';
 
 const route = Router();
 
-@Post('/register')
 route.post(
   '/register',
   celebrate({
@@ -31,7 +29,6 @@ route.post(
   }
 );
 
-@Post('/login')
 route.post(
   '/login',
   celebrate({
