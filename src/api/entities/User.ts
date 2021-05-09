@@ -5,22 +5,34 @@ import {
   BaseEntity,
   EntityRepository,
   Repository,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { IsEmail } from 'class-validator';
 import { Service } from 'typedi';
+import { Session } from './Session';
+import { Article } from './Article';
 
-export type Role = 'user' | 'staff' | 'admin';
+export enum Role {
+  CLIENT = 'CLIENT',
+  STAFF = 'STAFF',
+  ADMIN = 'ADMIN',
+}
 
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  id?: number;
+  id: number;
 
   @Column()
-  firstName?: string;
+  firstName: string;
 
   @Column()
-  lastName?: string;
+  lastName: string;
+
+  @Column({ type: 'date' })
+  birthDate: Date;
 
   @Column({ unique: true })
   @IsEmail(
@@ -29,17 +41,41 @@ export class User extends BaseEntity {
       message: 'Invalid email address',
     }
   )
-  email?: string;
+  email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password?: string;
 
   @Column()
-  role?: Role = 'user';
+  pseudo: string;
 
-  public hasAccessTo?(role: Role): boolean {
-    const roles = ['user', 'staff', 'admin'];
-    return roles.indexOf(this.role) >= roles.indexOf(role);
+  @Column({ nullable: true })
+  resetPasswordToken?: string;
+
+  @Column()
+  newsletter: boolean;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
+
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
+
+  @Column({
+    type: 'enum',
+    enum: ['ADMIN', 'CLIENT', 'STAFF'],
+    default: Role.CLIENT,
+  })
+  role: Role;
+
+  public hasAccessTo(role: Role): boolean {
+    return this.role === role;
   }
 }
 
