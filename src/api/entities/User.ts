@@ -13,6 +13,8 @@ import { IsEmail } from 'class-validator';
 import { Service } from 'typedi';
 import { Session } from './Session';
 import { Article } from './Article';
+import { Invoice } from './Invoice';
+import { Subscription } from './Subscription';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -23,7 +25,7 @@ export enum Role {
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  id: number;
+  userId: number;
 
   @Column()
   firstName: string;
@@ -56,16 +58,22 @@ export class User extends BaseEntity {
   newsletter: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
   @OneToMany(() => Article, (article) => article.author)
   articles: Article[];
+
+  @OneToMany(() => Invoice, (invoice) => invoice.user)
+  invoices: Invoice[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
 
   @Column({
     type: 'enum',

@@ -1,30 +1,27 @@
 import { Service } from 'typedi';
 import {
-  BaseEntity,
+  Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
   EntityRepository,
   Repository,
-  Entity,
   ManyToOne,
 } from 'typeorm';
+import { Subscription } from './Subscription';
 import { User } from './User';
 
 @Entity()
-export class Article extends BaseEntity {
+export class Invoice {
   @PrimaryGeneratedColumn('increment')
-  articleId: number;
+  invoiceId: number;
+
+  @Column({ type: 'date' })
+  billingDate: Date;
 
   @Column()
-  title: string;
-
-  @Column({ type: 'text' })
-  content: string;
-
-  @Column()
-  cover: string;
+  amount: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -33,9 +30,12 @@ export class Article extends BaseEntity {
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.userId)
-  author: User;
+  user: User;
+
+  @ManyToOne(() => Subscription, (subscription) => subscription.subscriptionId)
+  subscription: Subscription;
 }
 
 @Service()
-@EntityRepository(Article)
-export class ArticleRepository extends Repository<Article> {}
+@EntityRepository(Invoice)
+export class InvoiceRepository extends Repository<Invoice> {}

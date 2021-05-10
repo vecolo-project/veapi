@@ -15,7 +15,7 @@ import { User } from './User';
 @Entity()
 export class Session extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  id: number;
+  sessionId: number;
 
   @Column()
   value: string;
@@ -24,12 +24,12 @@ export class Session extends BaseEntity {
   expire_date: Date;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.userId)
   user: User;
 }
 
