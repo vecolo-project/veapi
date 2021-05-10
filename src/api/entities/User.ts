@@ -15,6 +15,8 @@ import { Session } from './Session';
 import { Article } from './Article';
 import { Invoice } from './Invoice';
 import { Subscription } from './Subscription';
+import { IssueThread } from './issueThread';
+import { Issue } from './issue';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -74,6 +76,12 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Subscription, (subscription) => subscription.user)
   subscriptions: Subscription[];
+
+  @OneToMany(() => IssueThread, (issueThread) => issueThread.author)
+  threads: IssueThread[];
+
+  @OneToMany(() => Issue, (issue) => issue.creator)
+  issue: Issue[];
 
   @Column({
     type: 'enum',
