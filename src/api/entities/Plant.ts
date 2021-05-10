@@ -19,14 +19,14 @@ export class Plan {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   price: number;
 
   @Column()
   costPerMinute: number;
 
-  @Column()
-  isUnlimited: number;
+  @Column({ default: false })
+  isUnlimited: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

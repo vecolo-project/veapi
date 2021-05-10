@@ -20,7 +20,7 @@ export class Invoice {
   @Column({ type: 'date' })
   billingDate: Date;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   amount: number;
 
   @CreateDateColumn()

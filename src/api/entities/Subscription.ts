@@ -25,7 +25,7 @@ export class Subscription {
   @Column()
   monthDuration: number;
 
-  @Column()
+  @Column({ default: false })
   autoRenew: boolean;
 
   @CreateDateColumn()

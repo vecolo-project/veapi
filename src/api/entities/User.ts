@@ -56,7 +56,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   resetPasswordToken?: string;
 
-  @Column()
+  @Column({ default: false })
   newsletter: boolean;
 
   @CreateDateColumn()
