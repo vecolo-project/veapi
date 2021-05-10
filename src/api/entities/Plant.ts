@@ -14,7 +14,7 @@ import { Subscription } from './Subscription';
 @Entity()
 export class Plan {
   @PrimaryGeneratedColumn('increment')
-  planId: number;
+  id: number;
 
   @Column()
   name: string;

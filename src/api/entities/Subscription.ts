@@ -17,7 +17,7 @@ import { User } from './User';
 @Entity()
 export class Subscription {
   @PrimaryGeneratedColumn('increment')
-  subscriptionId: number;
+  id: number;
 
   @Column({ type: 'date' })
   startDate: Date;
@@ -34,10 +34,10 @@ export class Subscription {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Plan, (plan) => plan.planId)
+  @ManyToOne(() => Plan, (plan) => plan.id)
   plan: Plan;
 
-  @ManyToOne(() => User, (user) => user.userId)
+  @ManyToOne(() => User, (user) => user.id)
   user: User;
 
   @OneToMany(() => Invoice, (invoice) => invoice.subscription)

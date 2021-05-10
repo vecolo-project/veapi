@@ -28,7 +28,7 @@ export enum IssueStatus {
 @Entity()
 export class Issue extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  issueId: number;
+  id: number;
 
   @Column()
   title: string;
@@ -49,7 +49,7 @@ export class Issue extends BaseEntity {
   })
   status: IssueStatus;
 
-  @ManyToOne(() => User, (user) => user.userId)
+  @ManyToOne(() => User, (user) => user.id)
   creator: User;
 
   @OneToMany(() => IssueThread, (issueThread) => issueThread.issue)

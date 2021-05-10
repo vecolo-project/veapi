@@ -16,15 +16,15 @@ import { User } from './User';
 @Entity()
 export class IssueThread extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  issueThreadId: number;
+  id: number;
 
   @Column({ type: 'text' })
   content: string;
 
-  @ManyToOne(() => User, (user) => user.userId)
+  @ManyToOne(() => User, (user) => user.id)
   author: User;
 
-  @ManyToOne(() => Issue, (issue) => issue.issueId)
+  @ManyToOne(() => Issue, (issue) => issue.id)
   issue: Issue;
 
   @CreateDateColumn()

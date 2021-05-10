@@ -15,7 +15,7 @@ import { User } from './User';
 @Entity()
 export class Article extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  articleId: number;
+  id: number;
 
   @Column()
   title: string;
@@ -32,7 +32,7 @@ export class Article extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.userId)
+  @ManyToOne(() => User, (user) => user.id)
   author: User;
 }
 

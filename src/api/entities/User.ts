@@ -27,7 +27,7 @@ export enum Role {
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  userId: number;
+  id: number;
 
   @Column()
   firstName: string;

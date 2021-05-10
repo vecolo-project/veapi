@@ -15,13 +15,13 @@ import { User } from './User';
 @Entity()
 export class Session extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  sessionId: number;
+  id: number;
 
   @Column()
   value: string;
 
   @Column()
-  expire_date: Date;
+  expireDate: Date;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -29,7 +29,7 @@ export class Session extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.userId)
+  @ManyToOne(() => User, (user) => user.id)
   user: User;
 }
 
