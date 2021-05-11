@@ -104,7 +104,7 @@ export interface UserResponse {
   token: string;
 }
 
-export interface userCreationProps {
+export interface UserCreationProps {
   firstName: string;
   lastName: string;
   email: string;
