@@ -13,9 +13,15 @@ import {
 import { Service } from 'typedi';
 import { Station } from './Station';
 import { BikeModel } from './BikeModel';
-import { BikeStatus } from './BikeStatus';
 import { Ride } from './Ride';
 import { BikeMaintenanceThread } from './BikeMaintenanceThread';
+
+export enum BikeStatus {
+  OFF = 'OFF',
+  MAINTAINING = 'MAINTAINING',
+  IN_RIDE = 'IN_RIDE',
+  RECHARING = 'RECHARING',
+}
 
 @Entity()
 export class Bike extends BaseEntity {
@@ -28,7 +34,7 @@ export class Bike extends BaseEntity {
   @ManyToOne(() => Station, (station) => station.id)
   station: Station;
 
-  @Column()
+  @Column({ type: 'double' })
   batteryPercent: number;
 
   @Column({ nullable: false, default: false })
@@ -37,7 +43,11 @@ export class Bike extends BaseEntity {
   @ManyToOne(() => BikeModel, (bikeModel) => bikeModel.id)
   model: BikeModel;
 
-  @ManyToOne(() => BikeStatus, (bikeStatus) => bikeStatus.id)
+  @Column({
+    type: 'enum',
+    enum: ['OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARING'],
+    default: BikeStatus.OFF,
+  })
   status: BikeStatus;
 
   @OneToMany(() => Ride, (ride) => ride.bike)

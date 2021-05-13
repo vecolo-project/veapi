@@ -103,7 +103,7 @@ export class User extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['ADMIN', 'CLIENT', 'STAFF'],
+    enum: ['ADMIN', 'CLIENT', 'STAFF', 'STATION'],
     default: Role.CLIENT,
   })
   role: Role;

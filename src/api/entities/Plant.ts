@@ -22,7 +22,7 @@ export class Plan {
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   price: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   costPerMinute: number;
 
   @Column({ nullable: false, default: false })

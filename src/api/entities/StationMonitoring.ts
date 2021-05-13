@@ -11,7 +11,12 @@ import {
 import { Service } from 'typedi';
 import { Station } from './Station';
 
-enum stationMonitoringStatus {}
+enum StationMonitoringStatus {
+  ACTIVE = 'ACTIVE',
+  MAINTAINING = 'MAINTAINING',
+  CHARGING = 'CHARGING',
+  OFF = 'OFF',
+}
 // demander a noé ce qu'il veut
 
 @Entity()
@@ -24,15 +29,15 @@ export class StationMonitoring extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['En service', 'En réparation', 'Inactive'],
-    default: 'En service',
+    enum: ['ACTIVE', 'MAINTAINING', 'CHARGING', 'OFF'],
+    default: StationMonitoringStatus.OFF,
   })
   status: string;
 
-  @Column()
+  @Column({ type: 'double' })
   batteryPercent: number;
 
-  @Column()
+  @Column({ type: 'double' })
   chargingPower: number;
 
   @Column()

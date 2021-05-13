@@ -22,22 +22,19 @@ export class BikeModel extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @ManyToOne(() => BikeModel, (bikeManufacturer) => bikeManufacturer.id)
-  bikeManufacturer: BikeModel;
-
-  @Column()
+  @Column({ type: 'double' })
   batteryCapacity: number;
 
-  @Column()
+  @Column({ type: 'double' })
   weight: number;
 
-  @Column()
+  @Column({ type: 'double' })
   maxPower: number;
 
-  @Column()
+  @Column({ type: 'double' })
   maxSpeed: number;
 
-  @Column()
+  @Column({ type: 'double' })
   maxDistance: number;
 
   @Column({ type: 'text' })
@@ -53,7 +50,7 @@ export class BikeModel extends BaseEntity {
   bikes: Bike[];
 
   @ManyToOne(() => BikeManufacturer, (bikeManufacturer) => bikeManufacturer.id)
-  manufacturer: BikeManufacturer;
+  biekManufacturer: BikeManufacturer;
 
   @CreateDateColumn()
   createdAt: Date;
