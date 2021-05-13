@@ -11,12 +11,15 @@ import {
 import { Service } from 'typedi';
 import { Station } from './Station';
 
+enum stationMonitoringStatus {}
+// demander a noé ce qu'il veut
+
 @Entity()
 export class StationMonitoring extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ nullable: false, default: false })
   isActive: boolean;
 
   @Column({

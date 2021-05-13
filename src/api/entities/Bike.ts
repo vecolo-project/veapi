@@ -29,9 +29,9 @@ export class Bike extends BaseEntity {
   station: Station;
 
   @Column()
-  battery_percent: number;
+  batteryPercent: number;
 
-  @Column()
+  @Column({ nullable: false, default: false })
   recharging: boolean;
 
   @ManyToOne(() => BikeModel, (bikeModel) => bikeModel.id)

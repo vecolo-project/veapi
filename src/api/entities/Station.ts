@@ -58,7 +58,7 @@ export class Station extends BaseEntity {
 
   @OneToMany(
     () => StationMaintenanceThread,
-    (station_maintenance_thread) => station_maintenance_thread.stationBreakdown
+    (stationMaintenanceThread) => stationMaintenanceThread.stationBreakdown
   )
   stationMaintenanceThread: StationMaintenanceThread[];
 

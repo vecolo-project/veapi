@@ -19,6 +19,9 @@ export class Ride extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  /**
+   * substration of 2 timestamp
+   */
   @Column()
   duration: number;
 

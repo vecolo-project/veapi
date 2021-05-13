@@ -25,7 +25,7 @@ export class Plan {
   @Column()
   costPerMinute: number;
 
-  @Column({ default: false })
+  @Column({ nullable: false, default: false })
   isUnlimited: boolean;
 
   @CreateDateColumn()
