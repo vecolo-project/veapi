@@ -1,10 +1,7 @@
 import { Container } from 'typedi';
-import CompanyService from '../../src/api/services/CompanyService';
 import databaseLoader from '../../src/loaders/database';
 import { Connection } from 'typeorm';
 import Logger from '../../src/logger';
-import CompanyFactory from '../../src/database/factories/CompanyFactory';
-import { Company } from '../../src/api/entities/Company';
 import CRUD from '../../src/api/services/CRUD';
 import EntitySeed from '../../src/database/seeds/EntitySeed';
 import { ErrorHandler } from '../../src/helpers/ErrorHandler';

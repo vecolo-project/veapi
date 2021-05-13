@@ -1,11 +1,14 @@
 import { Container } from 'typedi';
-import { IUserInputDTO, IUserResponseDTO } from '../../src/types';
 import UserService from '../../src/api/services/UserService';
 import databaseLoader from '../../src/loaders/database';
 import * as faker from 'faker';
 import { Connection } from 'typeorm';
 import Logger from '../../src/logger';
-import { User } from '../../src/api/entities/User';
+import {
+  User,
+  userCreationProps,
+  UserResponse,
+} from '../../src/api/entities/User';
 import EntitySeeder from '../../src/database/seeds/EntitySeed';
 import UserFactory from '../../src/database/factories/UserFactory';
 import { ErrorHandler } from '../../src/helpers/ErrorHandler';
@@ -20,7 +23,7 @@ describe('UserService', () => {
     connection = await databaseLoader();
     await connection.synchronize(true);
     userSeed = new EntitySeeder<User>(
-      connection.getMongoRepository(User),
+      connection.getRepository(User),
       UserFactory
     );
     Container.set('logger', Logger);
@@ -39,7 +42,7 @@ describe('UserService', () => {
 
   describe('register', () => {
     test('Should successfully create a user record', async () => {
-      const mockUserInput: IUserInputDTO = {
+      const mockUserInput: userCreationProps = {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         email: faker.internet.email(),
@@ -56,13 +59,13 @@ describe('UserService', () => {
 
     test('Should fail to create a user record if the email exists', async () => {
       const mockUser = await userSeed.seedOne();
-      const mockUserInput: IUserInputDTO = {
+      const mockUserInput: userCreationProps = {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         email: mockUser.email,
         password: faker.random.word(),
       };
-      let err: ErrorHandler, response: IUserResponseDTO;
+      let err: ErrorHandler, response: UserResponse;
       try {
         response = await userServiceInstance.register(mockUserInput);
       } catch (e) {
@@ -101,7 +104,7 @@ describe('UserService', () => {
         password: mockPassword,
       });
 
-      let err: ErrorHandler, response: IUserResponseDTO;
+      let err: ErrorHandler, response: UserResponse;
       try {
         response = await userServiceInstance.login(
           mockUser.email,
@@ -129,7 +132,7 @@ describe('UserService', () => {
   describe('findOne', () => {
     test('Should find a user by id', async () => {
       const user = await userSeed.seedOne();
-      const response = await userServiceInstance.findOne(user.id.toHexString());
+      const response = await userServiceInstance.findOne(user.id);
 
       expect(response).toBeDefined();
       expect(response.email).toEqual(user.email);

@@ -126,16 +126,13 @@ The route prefix is `/api` by default, but you can change this in the .env file.
 | **/api/auth/register**  | Auth - register endpoint                                 |
 | **/api/user**           | Example entity endpoint - returns all users              |
 | **/api/user/current**   | Example entity endpoint - returns current logged in user |
-| **/api/company**        | Example entity endpoint - returns all companies          |
-| **/api/company/:id**    | Example entity endpoint - returns a company by id        |
-| **/api/jobApplication** | Example entity endpoint - returns all job applications   |
 | ...                     | ...                                                      |
 
 ## Project Structure
 
 | Name                       | Description                                                  |
 | -------------------------- | ------------------------------------------------------------ |
-| **.mongodb/**              | Local MongoDB server data                                    |
+| **database/**              | Local database server data                                   |
 | **build/**                 | Compiled source files will be placed here                    |
 | **commands/**              | Custom CLI command tools used with npm scripts               |
 | **src/**                   | Source files                                                 |
@@ -149,6 +146,7 @@ The route prefix is `/api` by default, but you can change this in the .env file.
 | **src/types/** \*.d.ts     | Custom type definitions                                      |
 | **test** \*.spec.ts        | Unit and integration tests                                   |
 | .env.example               | Environment configurations                                   |
+| docker-compose.yml         | docker dev-env configurations                                |
 
 ## Logging
 

@@ -1,11 +1,12 @@
 import { Container } from 'typedi';
 import { Logger } from 'winston';
-import { Response, NextFunction, Request } from 'express';
+import { Response, NextFunction } from 'express';
 import { User } from '../entities/User';
 import UserService from '../services/UserService';
+import { userRequest } from '../../types/userRequest';
 
 const attachUser = async (
-  req: Request,
+  req: userRequest,
   res: Response,
   next: NextFunction
 ): Promise<unknown> => {

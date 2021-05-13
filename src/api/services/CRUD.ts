@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { MongoRepository, ObjectLiteral } from 'typeorm';
+import { ObjectLiteral, Repository } from 'typeorm';
 import { Logger } from 'winston';
 import { validate } from 'class-validator';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
@@ -7,15 +7,15 @@ import _ from 'lodash';
 
 @Service()
 export default class CRUD<Entity> {
-  protected repo: MongoRepository<Entity>;
+  protected repo: Repository<Entity>;
   protected logger: Logger;
 
-  constructor(repo: MongoRepository<Entity>, logger: Logger) {
+  constructor(repo: Repository<Entity>, logger: Logger) {
     this.repo = repo;
     this.logger = logger;
   }
 
-  getRepo(): MongoRepository<Entity> {
+  getRepo(): Repository<Entity> {
     return this.repo;
   }
 
@@ -64,7 +64,7 @@ export default class CRUD<Entity> {
     throw new ErrorHandler(404, 'Not found');
   }
 
-  async findOne(id: string): Promise<Entity | undefined> {
+  async findOne(id: number): Promise<Entity | undefined> {
     const entity = await this.repo.findOne(id);
     if (entity) {
       return entity;
@@ -72,7 +72,7 @@ export default class CRUD<Entity> {
     throw new ErrorHandler(404, 'Not found');
   }
 
-  async update(id: string, updatedFields: ObjectLiteral): Promise<Entity> {
+  async update(id: number, updatedFields: ObjectLiteral): Promise<Entity> {
     const entity = await this.repo.findOne(id);
     if (!entity) {
       throw new ErrorHandler(404, 'Not found');
