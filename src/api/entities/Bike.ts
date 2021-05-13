@@ -60,10 +60,10 @@ export class Bike extends BaseEntity {
   bikeMaintenanceThread: BikeMaintenanceThread[];
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }
 
 @Service()
