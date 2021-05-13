@@ -61,4 +61,4 @@ export class BikeModel extends BaseEntity {
 
 @Service()
 @EntityRepository(BikeModel)
-export class UserRepository extends Repository<BikeModel> {}
+export class BikeModelRepository extends Repository<BikeModel> {}

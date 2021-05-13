@@ -39,6 +39,6 @@ export class StationMaintenanceThread extends BaseEntity {
 
 @Service()
 @EntityRepository(StationMaintenanceThread)
-export class StationStatusRepository extends Repository<
+export class StationMaintenanceThreadRepository extends Repository<
   StationMaintenanceThread
 > {}

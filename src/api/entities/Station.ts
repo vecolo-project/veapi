@@ -74,4 +74,4 @@ export class Station extends BaseEntity {
 
 @Service()
 @EntityRepository(Station)
-export class StationStatusRepository extends Repository<Station> {}
+export class StationRepository extends Repository<Station> {}
