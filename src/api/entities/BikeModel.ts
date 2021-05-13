@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { Service } from 'typedi';
 import { Bike } from './Bike';
-import { BikeManufacturer } from "./BikeManufacturer";
+import { BikeManufacturer } from './BikeManufacturer';
 
 @Entity()
 export class BikeModel extends BaseEntity {

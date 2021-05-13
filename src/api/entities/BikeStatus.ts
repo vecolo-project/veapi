@@ -1,10 +1,8 @@
 import {
   BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   EntityRepository,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Repository,

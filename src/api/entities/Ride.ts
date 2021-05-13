@@ -11,8 +11,6 @@ import {
 } from 'typeorm';
 import { Service } from 'typedi';
 import { Station } from './Station';
-import { BikeModel } from './BikeModel';
-import { BikeStatus } from './BikeStatus';
 import { User } from './User';
 import { Bike } from './Bike';
 
