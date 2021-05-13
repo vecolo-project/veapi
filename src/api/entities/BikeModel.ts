@@ -8,8 +8,11 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Service } from 'typedi';
+import { Bike } from './Bike';
+import { BikeManufacturer } from "./BikeManufacturer";
 
 @Entity()
 export class BikeModel extends BaseEntity {
@@ -45,6 +48,12 @@ export class BikeModel extends BaseEntity {
 
   @Column()
   icon: string;
+
+  @OneToMany(() => Bike, (bike) => bike.station)
+  bikes: Bike[];
+
+  @ManyToOne(() => BikeManufacturer, (bikeManufacturer) => bikeManufacturer.id)
+  manufacturer: BikeManufacturer;
 
   @CreateDateColumn()
   created_at: Date;

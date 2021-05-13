@@ -12,6 +12,8 @@ import {
 import { Service } from 'typedi';
 import { StationMonitoring } from './StationMonitoring';
 import { StationMaintenanceThread } from './StationMaintenanceThread';
+import { Bike } from './Bike';
+import { Ride } from './Ride';
 
 @Entity()
 export class Station extends BaseEntity {
@@ -44,15 +46,24 @@ export class Station extends BaseEntity {
 
   @OneToMany(
     () => StationMonitoring,
-    (station_monitoring) => station_monitoring.id
+    (station_monitoring) => station_monitoring.station
   )
   station_monitoring: StationMonitoring[];
+
+  @OneToMany(() => Ride, (ride) => ride.start_station)
+  start_ride: Ride[];
+
+  @OneToMany(() => Ride, (ride) => ride.end_station)
+  end_ride: Ride[];
 
   @OneToMany(
     () => StationMaintenanceThread,
     (station_maintenance_thread) => station_maintenance_thread.station_breakdown
   )
   station_maintenance_thread: StationMaintenanceThread[];
+
+  @OneToMany(() => Bike, (bike) => bike.station)
+  bike: Bike[];
 
   @CreateDateColumn()
   created_at: Date;
