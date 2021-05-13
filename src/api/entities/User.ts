@@ -17,6 +17,9 @@ import { Invoice } from './Invoice';
 import { Subscription } from './Subscription';
 import { IssueThread } from './issueThread';
 import { Issue } from './issue';
+import { Ride } from './Ride';
+import { BikeMaintenanceThread } from './BikeMaintenanceThread';
+import { StationMaintenanceThread } from './StationMaintenanceThread';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -82,6 +85,21 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Issue, (issue) => issue.creator)
   issue: Issue[];
+
+  @OneToMany(() => Ride, (ride) => ride.user)
+  rides: Ride[];
+
+  @OneToMany(
+    () => BikeMaintenanceThread,
+    (bikeMaintenanceThread) => bikeMaintenanceThread.user
+  )
+  bikeMaintenanceThreads: BikeMaintenanceThread[];
+
+  @OneToMany(
+    () => StationMaintenanceThread,
+    (stationMaintenanceThread) => stationMaintenanceThread.user
+  )
+  stationMaintenanceThreads: StationMaintenanceThread[];
 
   @Column({
     type: 'enum',

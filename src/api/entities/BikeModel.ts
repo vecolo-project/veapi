@@ -19,28 +19,28 @@ export class BikeModel extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @ManyToOne(() => BikeModel, (bikeManufacturer) => bikeManufacturer.id)
   bikeManufacturer: BikeModel;
 
   @Column()
-  battery_capacity: number;
+  batteryCapacity: number;
 
   @Column()
   weight: number;
 
   @Column()
-  max_power: number;
+  maxPower: number;
 
   @Column()
-  max_speed: number;
+  maxSpeed: number;
 
   @Column()
-  max_distance: number;
+  maxDistance: number;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
 
   @Column()
@@ -56,10 +56,10 @@ export class BikeModel extends BaseEntity {
   manufacturer: BikeManufacturer;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 }
 
 @Service()

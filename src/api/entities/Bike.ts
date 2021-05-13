@@ -45,7 +45,7 @@ export class Bike extends BaseEntity {
 
   @OneToMany(
     () => BikeMaintenanceThread,
-    (bikeMaintenanceThread) => bikeMaintenanceThread.bike_breakdown
+    (bikeMaintenanceThread) => bikeMaintenanceThread.bikeBreakdown
   )
   bikeMaintenanceThread: BikeMaintenanceThread[];
 

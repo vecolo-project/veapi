@@ -23,10 +23,10 @@ export class Ride extends BaseEntity {
   duration: number;
 
   @ManyToOne(() => Station, (station) => station.id)
-  start_station: Station;
+  startStation: Station;
 
   @ManyToOne(() => Station, (station) => station.id)
-  end_station: Station;
+  endStation: Station;
 
   @ManyToOne(() => User, (user) => user.id)
   user: User;
@@ -35,16 +35,16 @@ export class Ride extends BaseEntity {
   bike: Bike;
 
   @Column()
-  ride_length: number;
+  rideLength: number;
 
   @Column()
-  invoice_amount: number;
+  invoiceAmount: number;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }
 
 @Service()

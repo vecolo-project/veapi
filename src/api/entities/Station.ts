@@ -21,16 +21,16 @@ export class Station extends BaseEntity {
   id: number;
 
   @Column()
-  battery_capacity: number;
+  batteryCapacity: number;
 
   @Column()
-  bike_capacity: number;
+  bikeCapacity: number;
 
   @Column()
-  street_number: number;
+  streetNumber: number;
 
   @Column()
-  street_name: string;
+  streetName: string;
 
   @Column()
   city: string;
@@ -39,37 +39,37 @@ export class Station extends BaseEntity {
   zipcode: string;
 
   @Column()
-  coordinate_x: number;
+  coordinateX: number;
 
   @Column()
-  coordinate_y: number;
+  coordinateY: number;
 
   @OneToMany(
     () => StationMonitoring,
-    (station_monitoring) => station_monitoring.station
+    (stationMonitoring) => stationMonitoring.station
   )
-  station_monitoring: StationMonitoring[];
+  stationMonitoring: StationMonitoring[];
 
-  @OneToMany(() => Ride, (ride) => ride.start_station)
-  start_ride: Ride[];
+  @OneToMany(() => Ride, (ride) => ride.startStation)
+  startRide: Ride[];
 
-  @OneToMany(() => Ride, (ride) => ride.end_station)
-  end_ride: Ride[];
+  @OneToMany(() => Ride, (ride) => ride.endStation)
+  endRide: Ride[];
 
   @OneToMany(
     () => StationMaintenanceThread,
-    (station_maintenance_thread) => station_maintenance_thread.station_breakdown
+    (station_maintenance_thread) => station_maintenance_thread.stationBreakdown
   )
-  station_maintenance_thread: StationMaintenanceThread[];
+  stationMaintenanceThread: StationMaintenanceThread[];
 
   @OneToMany(() => Bike, (bike) => bike.station)
   bike: Bike[];
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 }
 
 @Service()

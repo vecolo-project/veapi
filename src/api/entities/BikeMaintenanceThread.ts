@@ -21,20 +21,20 @@ export class BikeMaintenanceThread extends BaseEntity {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ type: 'text' })
   content: string;
 
   @ManyToOne(() => Bike, (bike) => bike.id)
-  bike_breakdown: Bike;
+  bikeBreakdown: Bike;
 
   @ManyToOne(() => User, (user) => user.id)
   user: User;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }
 
 @Service()

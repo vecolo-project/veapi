@@ -15,7 +15,7 @@ export class BikeStatus extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ nullable: false, default: false })
   available: boolean;
 
   @Column()

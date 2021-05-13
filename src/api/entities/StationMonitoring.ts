@@ -17,7 +17,7 @@ export class StationMonitoring extends BaseEntity {
   id: number;
 
   @Column()
-  is_active: boolean;
+  isActive: boolean;
 
   @Column({
     type: 'enum',
@@ -27,19 +27,19 @@ export class StationMonitoring extends BaseEntity {
   status: string;
 
   @Column()
-  battery_percent: number;
+  batteryPercent: number;
 
   @Column()
-  charging_power: number;
+  chargingPower: number;
 
   @Column()
-  used_bike_slot: number;
+  usedBikeSlot: number;
 
   @ManyToOne(() => Station, (station) => station.id)
   station: Station;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }
 
 @Service()
