@@ -30,4 +30,4 @@ export class BikeManufacturer extends BaseEntity {
 
 @Service()
 @EntityRepository(BikeManufacturer)
-export class UserRepository extends Repository<BikeManufacturer> {}
+export class BikeManufacturerRepository extends Repository<BikeManufacturer> {}
