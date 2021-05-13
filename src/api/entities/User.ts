@@ -13,6 +13,10 @@ import { IsEmail } from 'class-validator';
 import { Service } from 'typedi';
 import { Session } from './Session';
 import { Article } from './Article';
+import { Invoice } from './Invoice';
+import { Subscription } from './Subscription';
+import { IssueThread } from './issueThread';
+import { Issue } from './issue';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -52,20 +56,32 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   resetPasswordToken?: string;
 
-  @Column()
+  @Column({ default: false })
   newsletter: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
   @OneToMany(() => Article, (article) => article.author)
   articles: Article[];
+
+  @OneToMany(() => Invoice, (invoice) => invoice.user)
+  invoices: Invoice[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
+
+  @OneToMany(() => IssueThread, (issueThread) => issueThread.author)
+  threads: IssueThread[];
+
+  @OneToMany(() => Issue, (issue) => issue.creator)
+  issue: Issue[];
 
   @Column({
     type: 'enum',
@@ -88,7 +104,7 @@ export interface UserResponse {
   token: string;
 }
 
-export interface userCreationProps {
+export interface UserCreationProps {
   firstName: string;
   lastName: string;
   email: string;

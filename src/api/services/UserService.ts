@@ -4,7 +4,7 @@ import config from '../../config';
 import { Inject, Service } from 'typedi';
 import {
   User,
-  userCreationProps,
+  UserCreationProps,
   UserRepository,
   UserResponse,
 } from '../entities/User';
@@ -29,7 +29,7 @@ export default class UserService extends CRUD<User> {
     return this.userRepo;
   }
 
-  async register(userInput: userCreationProps): Promise<UserResponse> {
+  async register(userInput: UserCreationProps): Promise<UserResponse> {
     this.logger.debug('Registering user...');
     const hashedPassword = await bcrypt.hash(userInput.password, 12);
     const newUser = User.create({

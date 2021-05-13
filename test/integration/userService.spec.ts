@@ -6,7 +6,7 @@ import { Connection } from 'typeorm';
 import Logger from '../../src/logger';
 import {
   User,
-  userCreationProps,
+  UserCreationProps,
   UserResponse,
 } from '../../src/api/entities/User';
 import EntitySeeder from '../../src/database/seeds/EntitySeed';
@@ -42,7 +42,7 @@ describe('UserService', () => {
 
   describe('register', () => {
     test('Should successfully create a user record', async () => {
-      const mockUserInput: userCreationProps = {
+      const mockUserInput: UserCreationProps = {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         email: faker.internet.email(),
@@ -59,7 +59,7 @@ describe('UserService', () => {
 
     test('Should fail to create a user record if the email exists', async () => {
       const mockUser = await userSeed.seedOne();
-      const mockUserInput: userCreationProps = {
+      const mockUserInput: UserCreationProps = {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         email: mockUser.email,

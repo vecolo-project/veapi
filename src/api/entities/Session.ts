@@ -21,13 +21,13 @@ export class Session extends BaseEntity {
   value: string;
 
   @Column()
-  expire_date: Date;
+  expireDate: Date;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.id)
   user: User;
