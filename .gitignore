@@ -41,3 +41,6 @@ typings/
 # Local MongoDB Data Directory for testing
 .mongodb/
 database/
+
+#Localshit
+.idea
