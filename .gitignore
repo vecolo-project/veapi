@@ -40,7 +40,10 @@ typings/
 
 # Local MongoDB Data Directory for testing
 .mongodb/
+# Disallow access to docker mysql config
 database/
+# Allow src/database
+!src/database
 
 #Localshit
 .idea

@@ -16,8 +16,10 @@ const srcConfig = {
   synchronize: true,
   logging: false,
   entities: ['src/api/entities/**/*.ts'],
+  migrations: ['src/database/migration/**/*.ts'],
   cli: {
     entitiesDir: 'src/api/entities',
+    migrationsDir: 'src/database/migration',
   },
 };
 
@@ -33,8 +35,10 @@ const distConfig = {
   synchronize: false,
   logging: false,
   entities: ['dist/api/entities/**/*.js'],
+  migrations: ['dist/database/migration/**/*.ts'],
   cli: {
     entitiesDir: 'dist/api/entities',
+    migrationsDir: 'dist/database/migration',
   },
 };
 
