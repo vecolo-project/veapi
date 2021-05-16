@@ -14,7 +14,6 @@ import { Station } from './Station';
 enum StationMonitoringStatus {
   ACTIVE = 'ACTIVE',
   MAINTAINING = 'MAINTAINING',
-  CHARGING = 'CHARGING',
   OFF = 'OFF',
 }
 // demander a noé ce qu'il veut
@@ -29,7 +28,7 @@ export class StationMonitoring extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['ACTIVE', 'MAINTAINING', 'CHARGING', 'OFF'],
+    enum: ['ACTIVE', 'MAINTAINING', 'OFF'],
     default: StationMonitoringStatus.OFF,
   })
   status: string;
