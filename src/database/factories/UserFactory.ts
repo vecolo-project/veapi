@@ -8,9 +8,9 @@ export default async (data?: Partial<User>): Promise<User> => {
     password = await bcrypt.hash(data.password, 12);
   }
   const randomRole: Role = faker.random.arrayElement([
-    'user',
-    'staff',
-    'admin',
+    Role.ADMIN,
+    Role.CLIENT,
+    Role.STAFF,
   ]);
 
   const user = User.create({
