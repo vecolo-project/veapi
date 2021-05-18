@@ -42,6 +42,9 @@ export class User extends BaseEntity {
   @Column({ type: 'date' })
   birthDate: Date;
 
+  @Column({ nullable: false, default: true })
+  isActive: boolean;
+
   @Column({ unique: true })
   @IsEmail(
     {},
