@@ -24,6 +24,7 @@ in branch cleanning boilerplate
 - inquired
 
 ### Changed
+
 - userService use of Repository instead of MongodbRepository
 - database/seeds and database/factory the transition from MongoDB to MariaDB was destructive here.
 we should probably rething this part of the project later
@@ -34,3 +35,15 @@ we should probably rething this part of the project later
 - markdown
 - Unused Routes and models (Company and JobApplication)
 - commander
+
+## [1.1.0] - 2021-05-18
+
+### Added
+
+- All remaining entities
+- All enums for BDD
+- DockerFile
+  
+### changed
+
+- update user has access
