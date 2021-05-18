@@ -35,7 +35,7 @@ const distConfig = {
   synchronize: false,
   logging: false,
   entities: ['dist/api/entities/**/*.js'],
-  migrations: ['dist/database/migration/**/*.ts'],
+  migrations: ['dist/database/migration/**/*.js'],
   cli: {
     entitiesDir: 'dist/api/entities',
     migrationsDir: 'dist/database/migration',

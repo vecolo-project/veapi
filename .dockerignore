@@ -1,0 +1,9 @@
+.idea
+.git
+.env*
+.gitignore
+dist
+test
+node_modules
+Procfile
+README.md

@@ -61,7 +61,7 @@ if (process.env.NODE_ENV === 'development') {
     logs: {
       level: process.env.LOG_LEVEL,
     },
-    endpointPrefix: process.env.ENDPOINT_PREFIX || 'api',
+    endpointPrefix: process.env.ENDPOINT_PREFIX || '',
   };
 }
 
