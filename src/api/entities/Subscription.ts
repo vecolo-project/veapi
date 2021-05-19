@@ -11,7 +11,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Invoice } from './Invoice';
-import { Plan } from './Plant';
+import { Plan } from './Plan';
 import { User } from './User';
 
 @Entity()
