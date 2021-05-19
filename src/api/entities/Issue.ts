@@ -11,7 +11,7 @@ import {
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
-import { IssueThread } from './issueThread';
+import { IssueThread } from './IssueThread';
 import { User } from './User';
 
 export enum IssueType {

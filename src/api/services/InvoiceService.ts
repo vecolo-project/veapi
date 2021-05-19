@@ -7,7 +7,7 @@ import { Logger } from 'winston';
 @Service()
 export default class InvoiceService extends CRUD<Invoice> {
   constructor(
-    @InjectRepository() protected invoiceRepo: InvoiceRepository,
+    @InjectRepository(Invoice) protected invoiceRepo: InvoiceRepository,
     @Inject('logger') protected logger: Logger
   ) {
     super(invoiceRepo, logger);

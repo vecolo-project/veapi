@@ -12,7 +12,7 @@ export default class BikeMaintenanceThreadService extends CRUD<
   BikeMaintenanceThread
 > {
   constructor(
-    @InjectRepository(BikeMaintenanceThreadRepository)
+    @InjectRepository(BikeMaintenanceThread)
     protected bikeMaintenanceThreadRepo: BikeMaintenanceThreadRepository,
     @Inject('logger')
     protected logger: Logger
