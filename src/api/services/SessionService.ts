@@ -14,4 +14,8 @@ export default class SessionService extends CRUD<Session> {
   ) {
     super(sessionRepo, logger);
   }
+
+  async getOneFromValue(value: string): Promise<Session | null> {
+    return this.sessionRepo.findOne({ where: { value: value } });
+  }
 }

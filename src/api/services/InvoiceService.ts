@@ -16,7 +16,7 @@ export default class InvoiceService extends CRUD<Invoice> {
   async getAllFromUserInPreviousMonth(
     id: number,
     date_end: Date
-  ): Promise<Invoice[]> {
+  ): Promise<Invoice[] | null> {
     const date_start: Date = date_end;
     date_start.setMonth(date_start.getMonth() - 1);
     return this.invoiceRepo

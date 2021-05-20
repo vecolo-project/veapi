@@ -15,14 +15,14 @@ export default class RideService extends CRUD<Ride> {
     super(rideRepo, logger);
   }
 
-  async getAllRideFromUser(id: number): Promise<Ride[]> {
+  async getAllRideFromUser(id: number): Promise<Ride[] | null> {
     return this.rideRepo.find({
       where: { user: id },
       order: { createdAt: 'DESC' },
     });
   }
 
-  async getAllRideFromBike(id: number): Promise<Ride[]> {
+  async getAllRideFromBike(id: number): Promise<Ride[] | null> {
     return this.rideRepo.find({
       where: { user: id },
       order: { createdAt: 'DESC' },

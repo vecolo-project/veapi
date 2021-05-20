@@ -20,7 +20,7 @@ export default class BikeMaintenanceThreadService extends CRUD<
     super(bikeMaintenanceThreadRepo, logger);
   }
 
-  async getAllFromBike(id: number): Promise<BikeMaintenanceThread[]> {
+  async getAllFromBike(id: number): Promise<BikeMaintenanceThread[] | null> {
     return this.bikeMaintenanceThreadRepo.find({
       where: {
         bikeBreakdown: id,

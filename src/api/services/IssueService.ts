@@ -16,7 +16,7 @@ export default class IssueService extends CRUD<Issue> {
     super(issueRepo, logger);
   }
 
-  async getAllFromCreator(id: number): Promise<Issue[]> {
+  async getAllFromCreator(id: number): Promise<Issue[] | null> {
     return this.issueRepo.find({ where: { creator: id } });
   }
 }
