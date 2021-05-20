@@ -137,4 +137,6 @@ export interface UserCreationProps {
   lastName: string;
   email: string;
   password: string;
+  birthDate: Date;
+  pseudo: string;
 }

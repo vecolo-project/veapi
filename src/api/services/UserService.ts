@@ -37,6 +37,8 @@ export default class UserService extends CRUD<User> {
       lastName: userInput.lastName,
       email: userInput.email,
       password: hashedPassword,
+      birthDate: userInput.birthDate,
+      pseudo: userInput.pseudo,
     });
     const errors = await validate(newUser, {
       validationError: { target: false },
