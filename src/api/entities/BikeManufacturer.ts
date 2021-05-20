@@ -24,7 +24,7 @@ export class BikeManufacturer extends BaseEntity {
   @Column()
   address: string;
 
-  @OneToMany(() => BikeModel, (bikeModel) => bikeModel.biekManufacturer)
+  @OneToMany(() => BikeModel, (bikeModel) => bikeModel.bikeManufacturer)
   bikeModel: BikeModel[];
 }
 
