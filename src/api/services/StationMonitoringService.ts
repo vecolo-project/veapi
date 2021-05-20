@@ -17,4 +17,17 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
   ) {
     super(stationMonitoringRepo, logger);
   }
+
+  async getLastStationMonitoring(
+    stationId: number
+  ): Promise<StationMonitoring | undefined> {
+    return await this.stationMonitoringRepo.findOne({
+      where: {
+        station: {
+          id: stationId,
+        },
+      },
+      order: { id: 'DESC' },
+    });
+  }
 }

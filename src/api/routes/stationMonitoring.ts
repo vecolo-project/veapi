@@ -6,7 +6,11 @@ import isStation from '../middlewares/isStation';
 import attachStation from '../middlewares/attachStation';
 import { StationRequest } from '../../types/stationRequest';
 import StationMonitoringService from '../services/StationMonitoringService';
-import { StationMonitoring } from '../entities/StationMonitoring';
+import {
+  StationMonitoring,
+  StationMonitoringCreationProps,
+  StationMonitoringStatus,
+} from '../entities/StationMonitoring';
 import { celebrate, Joi } from 'celebrate';
 
 const route = Router();
@@ -17,31 +21,47 @@ route.post(
   attachStation,
   celebrate({
     body: Joi.object({
-      status: Joi.string().required(),
-      batteryPercent: Joi.number().required(),
-      chargingPower: Joi.number().required(),
-      isActive: Joi.boolean().required(),
-      usedBikeSlot: Joi.number().integer().required(),
+      battery: Joi.number().required(),
+      charging_power: Joi.number().required(),
+      active: Joi.boolean().required(),
+      used_seats: Joi.number().integer().required(),
     }),
   }),
   async (req: StationRequest, res: Response, next: NextFunction) => {
     const logger: Logger = Container.get('logger');
-    logger.debug('Calling GET /station-monitoring/add-metric endpoint');
+    logger.debug('Calling POST /station-monitoring/add-metric endpoint');
     try {
       const station: Station = req.currentStation;
+      const stationMonitoringProps: StationMonitoringCreationProps = {
+        station,
+        batteryPercent: req.body.battery,
+        status: req.body.active
+          ? StationMonitoringStatus.ACTIVE
+          : StationMonitoringStatus.OFF,
+        chargingPower: req.body.charging_power,
+        isActive: req.body.active,
+        usedBikeSlot: req.body.used_seats,
+      };
       const stationMonitoringService = Container.get(StationMonitoringService);
+
+      const previousStationMonitoring: StationMonitoring = await stationMonitoringService.getLastStationMonitoring(
+        station.id
+      );
+
+      if (
+        previousStationMonitoring &&
+        previousStationMonitoring.status == StationMonitoringStatus.MAINTAINING
+      ) {
+        stationMonitoringProps.isActive = false;
+        stationMonitoringProps.status = StationMonitoringStatus.MAINTAINING;
+      }
+
       const stationMonitoring: StationMonitoring = await stationMonitoringService.create(
         StationMonitoring.create({
-          station,
-          status: req.body.status,
-          batteryPercent: req.body.batteryPercent,
-          chargingPower: req.body.chargingPower,
-          isActive: req.body.isActive,
-          usedBikeSlot: req.body.usedBikeSlot,
-          createdAt: new Date(),
+          ...stationMonitoringProps,
         })
       );
-      return res.json(stationMonitoring).status(200);
+      return res.json(stationMonitoring).status(201);
     } catch (e) {
       return next(e);
     }

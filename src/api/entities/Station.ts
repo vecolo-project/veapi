@@ -38,10 +38,10 @@ export class Station extends BaseEntity {
   @Column()
   zipcode: string;
 
-  @Column()
+  @Column('double')
   coordinateX: number;
 
-  @Column()
+  @Column('double')
   coordinateY: number;
 
   @OneToMany(

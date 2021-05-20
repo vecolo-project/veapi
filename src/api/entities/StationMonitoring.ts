@@ -11,7 +11,7 @@ import {
 import { Service } from 'typedi';
 import { Station } from './Station';
 
-enum StationMonitoringStatus {
+export enum StationMonitoringStatus {
   ACTIVE = 'ACTIVE',
   MAINTAINING = 'MAINTAINING',
   OFF = 'OFF',
