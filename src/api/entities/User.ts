@@ -25,6 +25,7 @@ export enum Role {
   CLIENT = 'CLIENT',
   STAFF = 'STAFF',
   ADMIN = 'ADMIN',
+  STATION = 'STATION',
 }
 
 @Entity()
@@ -40,6 +41,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'date' })
   birthDate: Date;
+
+  @Column({ nullable: false, default: true })
+  isActive: boolean;
 
   @Column({ unique: true })
   @IsEmail(
@@ -109,6 +113,12 @@ export class User extends BaseEntity {
   role: Role;
 
   public hasAccessTo(role: Role): boolean {
+    if (this.role === Role.ADMIN) {
+      return true;
+    }
+    if (role === Role.CLIENT && this.role === Role.STAFF) {
+      return true;
+    }
     return this.role === role;
   }
 }

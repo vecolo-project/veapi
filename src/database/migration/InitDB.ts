@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class initDB1620898832435 implements MigrationInterface {
-  name = 'initDB1620898832435';
+export class InitDB1621280558787 implements MigrationInterface {
+  name = 'InitDB1621280558787';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -23,7 +23,7 @@ export class initDB1620898832435 implements MigrationInterface {
       'CREATE TABLE `issue_thread` (`id` int NOT NULL AUTO_INCREMENT, `content` text NOT NULL, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `authorId` int NULL, `issueId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB'
     );
     await queryRunner.query(
-      "CREATE TABLE `station_monitoring` (`id` int NOT NULL AUTO_INCREMENT, `isActive` tinyint NOT NULL DEFAULT 0, `status` enum ('ACTIVE', 'MAINTAINING', 'CHARGING', 'OFF') NOT NULL DEFAULT 'OFF', `batteryPercent` double NOT NULL, `chargingPower` double NOT NULL, `usedBikeSlot` int NOT NULL, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `stationId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB"
+      "CREATE TABLE `station_monitoring` (`id` int NOT NULL AUTO_INCREMENT, `isActive` tinyint NOT NULL DEFAULT 0, `status` enum ('ACTIVE', 'MAINTAINING', 'OFF') NOT NULL DEFAULT 'OFF', `batteryPercent` double NOT NULL, `chargingPower` double NOT NULL, `usedBikeSlot` int NOT NULL, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `stationId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB"
     );
     await queryRunner.query(
       'CREATE TABLE `station_maintenance_thread` (`id` int NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `content` text NOT NULL, `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `stationBreakdownId` int NULL, `userId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB'
@@ -38,7 +38,7 @@ export class initDB1620898832435 implements MigrationInterface {
       'CREATE TABLE `bike_maintenance_thread` (`id` int NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `content` text NOT NULL, `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `bikeBreakdownId` int NULL, `userId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB'
     );
     await queryRunner.query(
-      "CREATE TABLE `bike` (`id` int NOT NULL AUTO_INCREMENT, `matriculate` varchar(255) NOT NULL, `batteryPercent` double NOT NULL, `recharging` tinyint NOT NULL DEFAULT 0, `status` enum ('OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARING') NOT NULL DEFAULT 'OFF', `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `stationId` int NULL, `modelId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB"
+      "CREATE TABLE `bike` (`id` int NOT NULL AUTO_INCREMENT, `matriculate` varchar(255) NOT NULL, `batteryPercent` double NOT NULL, `recharging` tinyint NOT NULL DEFAULT 0, `status` enum ('OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARING') NOT NULL DEFAULT 'OFF', `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `stationId` int NULL, `modelId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB"
     );
     await queryRunner.query(
       'CREATE TABLE `station` (`id` int NOT NULL AUTO_INCREMENT, `batteryCapacity` int NOT NULL, `bikeCapacity` int NOT NULL, `streetNumber` int NOT NULL, `streetName` varchar(255) NOT NULL, `city` varchar(255) NOT NULL, `zipcode` varchar(255) NOT NULL, `coordinateX` int NOT NULL, `coordinateY` int NOT NULL, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), PRIMARY KEY (`id`)) ENGINE=InnoDB'
@@ -47,7 +47,7 @@ export class initDB1620898832435 implements MigrationInterface {
       'CREATE TABLE `ride` (`id` int NOT NULL AUTO_INCREMENT, `duration` int NOT NULL, `rideLength` int NOT NULL, `invoiceAmount` int NOT NULL, `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `startStationId` int NULL, `endStationId` int NULL, `userId` int NULL, `bikeId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB'
     );
     await queryRunner.query(
-      "CREATE TABLE `user` (`id` int NOT NULL AUTO_INCREMENT, `firstName` varchar(255) NOT NULL, `lastName` varchar(255) NOT NULL, `birthDate` date NOT NULL, `email` varchar(255) NOT NULL, `password` varchar(255) NULL, `pseudo` varchar(255) NOT NULL, `resetPasswordToken` varchar(255) NULL, `newsletter` tinyint NOT NULL DEFAULT 0, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `role` enum ('ADMIN', 'CLIENT', 'STAFF', 'STATION') NOT NULL DEFAULT 'CLIENT', UNIQUE INDEX `IDX_e12875dfb3b1d92d7d7c5377e2` (`email`), PRIMARY KEY (`id`)) ENGINE=InnoDB"
+      "CREATE TABLE `user` (`id` int NOT NULL AUTO_INCREMENT, `firstName` varchar(255) NOT NULL, `lastName` varchar(255) NOT NULL, `birthDate` date NOT NULL, `isActive` tinyint NOT NULL DEFAULT 1, `email` varchar(255) NOT NULL, `password` varchar(255) NULL, `pseudo` varchar(255) NOT NULL, `resetPasswordToken` varchar(255) NULL, `newsletter` tinyint NOT NULL DEFAULT 0, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `role` enum ('ADMIN', 'CLIENT', 'STAFF', 'STATION') NOT NULL DEFAULT 'CLIENT', UNIQUE INDEX `IDX_e12875dfb3b1d92d7d7c5377e2` (`email`), PRIMARY KEY (`id`)) ENGINE=InnoDB"
     );
     await queryRunner.query(
       'CREATE TABLE `article` (`id` int NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `content` text NOT NULL, `cover` varchar(255) NOT NULL, `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `authorId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB'
