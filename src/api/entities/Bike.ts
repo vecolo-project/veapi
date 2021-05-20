@@ -20,7 +20,7 @@ export enum BikeStatus {
   OFF = 'OFF',
   MAINTAINING = 'MAINTAINING',
   IN_RIDE = 'IN_RIDE',
-  RECHARING = 'RECHARING',
+  RECHARGING = 'RECHARGING',
 }
 
 @Entity()
@@ -45,7 +45,7 @@ export class Bike extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARING'],
+    enum: ['OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARGING'],
     default: BikeStatus.OFF,
   })
   status: BikeStatus;

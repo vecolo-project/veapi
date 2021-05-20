@@ -21,4 +21,12 @@ export default class ArticleService extends CRUD<Article> {
       .where('Article.name LIKE :tags', { tags: tags })
       .getMany();
   }
+
+  async getAllFromUser(id: number): Promise<Article[]> {
+    return this.articleRepo.find({ where: { author: id } });
+  }
+
+  async getNewestArticle(): Promise<Article[]> {
+    return this.articleRepo.find({ order: { createdAt: 'DESC' } });
+  }
 }
