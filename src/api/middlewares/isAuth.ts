@@ -2,7 +2,7 @@ import jwt from 'express-jwt';
 import config from '../../config';
 import { Request } from 'express';
 
-const getTokenFromHeader = (req: Request) => {
+export const getTokenFromHeader = (req: Request) => {
   if (
     (req.headers.authorization &&
       req.headers.authorization.split(' ')[0] === 'Token') ||
