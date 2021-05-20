@@ -54,3 +54,12 @@ export class StationMonitoring extends BaseEntity {
 export class StationMonitoringRepository extends Repository<
   StationMonitoring
 > {}
+
+export interface StationMonitoringCreationProps {
+  isActive: boolean;
+  status: string;
+  batteryPercent: number;
+  chargingPower: number;
+  usedBikeSlot: number;
+  station: Station;
+}
