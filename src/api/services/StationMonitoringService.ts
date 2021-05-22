@@ -4,8 +4,13 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import {
   StationMonitoring,
+  StationMonitoringCreationProps,
   StationMonitoringRepository,
+  StationMonitoringStatus,
 } from '../entities/StationMonitoring';
+import { Station } from '../entities/Station';
+import { throws } from 'assert';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 @Service()
 export default class StationMonitoringService extends CRUD<StationMonitoring> {
@@ -29,5 +34,28 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
       },
       order: { id: 'DESC' },
     });
+  }
+
+  async addMetric(
+    stationId: number,
+    stationMonitoringProps: StationMonitoringCreationProps
+  ): Promise<StationMonitoring | undefined> {
+    const previousStationMonitoring:
+      | StationMonitoring
+      | undefined = await this.getLastStationMonitoring(stationId);
+
+    if (
+      previousStationMonitoring &&
+      previousStationMonitoring.status == StationMonitoringStatus.MAINTAINING
+    ) {
+      stationMonitoringProps.isActive = false;
+      stationMonitoringProps.status = StationMonitoringStatus.MAINTAINING;
+    }
+
+    return await this.create(
+      StationMonitoring.create({
+        ...stationMonitoringProps,
+      })
+    );
   }
 }

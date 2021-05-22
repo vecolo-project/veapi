@@ -17,13 +17,8 @@ export default class StationService extends CRUD<Station> {
     super(stationRepo, logger);
   }
 
-  generateToken(stationRecord: Station): string {
-    this.logger.debug(`Signing JWT for stationId: ${stationRecord.id}`);
-    return jwt.sign(
-      {
-        id: stationRecord.id,
-      },
-      config.jwtSecret
-    );
+  generateToken({ id }: Station): string {
+    this.logger.debug(`Signing JWT for stationId: ${id}`);
+    return jwt.sign({ id }, config.jwtSecret);
   }
 }

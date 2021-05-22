@@ -13,7 +13,9 @@ const attachStation = async (
   const logger: Logger = Container.get('logger');
   try {
     const stationService = Container.get(StationService);
-    const stationEntity: Station = await stationService.findOne(req.token.id);
+    const stationEntity: Station | undefined = await stationService.findOne(
+      req.token.id
+    );
     if (!stationEntity) {
       return res.sendStatus(401);
     }

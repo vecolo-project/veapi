@@ -43,23 +43,9 @@ route.post(
         usedBikeSlot: req.body.used_seats,
       };
       const stationMonitoringService = Container.get(StationMonitoringService);
-
-      const previousStationMonitoring: StationMonitoring = await stationMonitoringService.getLastStationMonitoring(
-        station.id
-      );
-
-      if (
-        previousStationMonitoring &&
-        previousStationMonitoring.status == StationMonitoringStatus.MAINTAINING
-      ) {
-        stationMonitoringProps.isActive = false;
-        stationMonitoringProps.status = StationMonitoringStatus.MAINTAINING;
-      }
-
-      const stationMonitoring: StationMonitoring = await stationMonitoringService.create(
-        StationMonitoring.create({
-          ...stationMonitoringProps,
-        })
+      const stationMonitoring = await stationMonitoringService.addMetric(
+        station.id,
+        stationMonitoringProps
       );
       return res.json(stationMonitoring).status(201);
     } catch (e) {
