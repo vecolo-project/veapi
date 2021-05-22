@@ -14,4 +14,8 @@ export default class BikeModelService extends CRUD<BikeModel> {
   ) {
     super(bikeModelRepo, logger);
   }
+
+  async getAllFromManufacturer(id: number): Promise<BikeModel[]> {
+    return this.bikeModelRepo.find({ where: { bikeManufacturer: id } });
+  }
 }

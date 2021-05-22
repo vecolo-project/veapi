@@ -27,4 +27,8 @@ export default class BikeMaintenanceThreadService extends CRUD<
       },
     });
   }
+
+  async getAllFromUser(id: number): Promise<BikeMaintenanceThread[]> {
+    return this.bikeMaintenanceThreadRepo.find({ where: { user: id } });
+  }
 }

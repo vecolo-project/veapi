@@ -50,7 +50,7 @@ export class BikeModel extends BaseEntity {
   bikes: Bike[];
 
   @ManyToOne(() => BikeManufacturer, (bikeManufacturer) => bikeManufacturer.id)
-  biekManufacturer: BikeManufacturer;
+  bikeManufacturer: BikeManufacturer;
 
   @CreateDateColumn()
   createdAt: Date;
