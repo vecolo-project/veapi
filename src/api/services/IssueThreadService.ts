@@ -14,4 +14,12 @@ export default class IssueThreadService extends CRUD<IssueThread> {
   ) {
     super(issueThreadRepo, logger);
   }
+
+  async getAllFromUser(id: number): Promise<IssueThread[] | null> {
+    return this.issueThreadRepo.find({ where: { author: id } });
+  }
+
+  async getAllFromIssue(id: number): Promise<IssueThread[] | null> {
+    return this.issueThreadRepo.find({ where: { issue: id } });
+  }
 }
