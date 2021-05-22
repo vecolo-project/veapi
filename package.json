@@ -11,10 +11,11 @@
     "lint:fix": "eslint . --fix",
     "test": "cross-env NODE_ENV=test TS_NODE=true jest --runInBand",
     "seed": "ts-node -T commands/seed.ts",
-    "generate": "ts-node -T commands/generate.ts",
     "semantic-release": "semantic-release",
     "generate-migration": "npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
-    "migrate": "npx ts-node node_modules/.bin/typeorm migration:run"
+    "generate-migration:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
+    "migrate": "npx ts-node node_modules/.bin/typeorm migration:run",
+    "migrate:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:run"
   },
   "repository": {
     "type": "git",

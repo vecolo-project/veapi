@@ -15,8 +15,8 @@ import { Session } from './Session';
 import { Article } from './Article';
 import { Invoice } from './Invoice';
 import { Subscription } from './Subscription';
-import { IssueThread } from './issueThread';
-import { Issue } from './issue';
+import { IssueThread } from './IssueThread';
+import { Issue } from './Issue';
 import { Ride } from './Ride';
 import { BikeMaintenanceThread } from './BikeMaintenanceThread';
 import { StationMaintenanceThread } from './StationMaintenanceThread';
@@ -137,4 +137,6 @@ export interface UserCreationProps {
   lastName: string;
   email: string;
   password: string;
+  birthDate: Date;
+  pseudo: string;
 }

@@ -10,7 +10,7 @@ import {
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
-import { Issue } from './issue';
+import { Issue } from './Issue';
 import { User } from './User';
 
 @Entity()

@@ -14,6 +14,8 @@ route.post(
       lastName: Joi.string().required(),
       email: Joi.string().required(),
       password: Joi.string().required(),
+      birthDate: Joi.date().required(),
+      pseudo: Joi.string().required(),
     }),
   }),
   async (req, res, next) => {
