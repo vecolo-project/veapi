@@ -93,8 +93,9 @@ route.put(
   }),
   async (req, res, next) => {
     const articleService = Container.get(ArticleService);
+    const id = Number.parseInt(req.params.id);
     try {
-      const article = await articleService.create(req.body);
+      const article = await articleService.update(id, req.body);
       return res.status(201).json(article);
     } catch (e) {
       return next(e);
