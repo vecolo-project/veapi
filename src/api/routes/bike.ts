@@ -1,32 +1,33 @@
 import { Router } from 'express';
-import { celebrate, Joi } from 'celebrate';
 import { attachUser, checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
-import ArticleService from '../services/ArticleService';
+import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
-import { userRequest } from '../../types/userRequest';
-import { Article } from '../entities/Article';
+import BikeService from '../services/BikeService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    title: Joi.string().max(32).min(10).required(),
-    content: Joi.string().required(),
-    cover: Joi.string().required(),
+    matriculate: Joi.string().max(32).min(10).required(),
+    station: Joi.number().min(0).required(),
+    batteryPercent: Joi.number().min(0).max(100).required(),
+    recharging: Joi.boolean().required(),
+    model: Joi.number().min(0).required(),
+    status: Joi.string()
+      .allow('OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARGING')
+      .required(),
   }),
 });
-const defaultService = ArticleService;
-const basePath = '/article';
+const basePath = '/bike';
+const defaultService = BikeService;
 
 route.post(
   basePath,
   isAuth,
   checkRole(Role.STAFF),
-  attachUser,
   paramsRules,
-  async (req: userRequest, res, next) => {
+  async (req, res, next) => {
     const service = Container.get(defaultService);
-    req.body.author = req.currentUser.id;
     try {
       const entityResult = await service.create(req.body);
       return res.status(201).json(entityResult);
@@ -41,14 +42,8 @@ route.get(basePath, async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
     const limit = req.body.limit || 20;
-    let articles: Article[];
-    if (typeof req.body.tags !== 'undefined') {
-      const tags = escape(req.body.tags);
-      articles = await service.searchByName(tags, { offset, limit });
-    } else {
-      articles = await service.find({ offset, limit });
-    }
-    return res.status(200).json(articles);
+    const entityResult = await service.find({ offset, limit });
+    return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);
   }
@@ -73,8 +68,8 @@ route.delete(
     try {
       const service = Container.get(defaultService);
       const id = Number.parseInt(req.params.id);
-      const entityResult = await service.delete(id);
-      return res.status(204).json(entityResult);
+      const articles = await service.delete(id);
+      return res.status(204).json(articles);
     } catch (e) {
       return next(e);
     }
