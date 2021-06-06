@@ -62,15 +62,44 @@ route.get('/article/:id', async (req, res, next) => {
   }
 });
 
-route.delete('/article/:id', async (req, res, next) => {
-  try {
-    const articleService = Container.get(ArticleService);
-    const id = Number.parseInt(req.params.id);
-    const articles = await articleService.delete(id);
-    return res.status(204).json(articles);
-  } catch (e) {
-    return next(e);
+route.delete(
+  '/article/:id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const articleService = Container.get(ArticleService);
+      const id = Number.parseInt(req.params.id);
+      const articles = await articleService.delete(id);
+      return res.status(204).json(articles);
+    } catch (e) {
+      return next(e);
+    }
   }
-});
+);
+
+route.put(
+  'article/:id',
+  isAuth,
+  checkRole(Role.STAFF),
+  attachUser,
+  celebrate({
+    body: Joi.object({
+      title: Joi.string().max(32).min(10).required(),
+      content: Joi.string().required(),
+      cover: Joi.string().required(),
+      author: Joi.number().min(1).required(),
+    }),
+  }),
+  async (req, res, next) => {
+    const articleService = Container.get(ArticleService);
+    try {
+      const article = await articleService.create(req.body);
+      return res.status(201).json(article);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
 
 export default route;
