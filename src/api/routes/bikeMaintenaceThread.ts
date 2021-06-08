@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { checkRole, isAuth } from '../middlewares';
-import { Role } from '../entities/User';
-import { celebrate, Joi } from 'celebrate';
-import { Container } from 'typedi';
-import BikeService from '../services/BikeService';
+import { Router } from "express";
+import { celebrate, Joi } from "celebrate";
+import BikeService from "../services/BikeService";
+import { checkRole, isAuth } from "../middlewares";
+import { Role } from "../entities/User";
+import { Container } from "typedi";
 
 const route = Router();
 const paramsRules = celebrate({
