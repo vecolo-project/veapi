@@ -1,25 +1,21 @@
-import { Router } from "express";
-import { celebrate, Joi } from "celebrate";
-import BikeService from "../services/BikeService";
-import { checkRole, isAuth } from "../middlewares";
-import { Role } from "../entities/User";
-import { Container } from "typedi";
+import { Router } from 'express';
+import { celebrate, Joi } from 'celebrate';
+import { attachUser, checkRole, isAuth } from '../middlewares';
+import { Role } from '../entities/User';
+import { Container } from 'typedi';
+import BikeMaintenanceThreadService from '../services/BikeMaintenanceThreadService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    matriculate: Joi.string().max(32).min(10).required(),
-    station: Joi.number().min(0).required(),
-    batteryPercent: Joi.number().min(0).max(100).required(),
-    recharging: Joi.boolean().required(),
-    model: Joi.number().min(0).required(),
-    status: Joi.string()
-      .allow('OFF', 'MAINTAINING', 'IN_RIDE', 'RECHARGING')
-      .required(),
+    title: Joi.string().min(10).max(64).required(),
+    content: Joi.string().min(10).required(),
+    bikeBreakdown: Joi.number().min(0).required(),
+    user: Joi.number().min(0).required(),
   }),
 });
-const basePath = '/bike';
-const defaultService = BikeService;
+const basePath = '/bikeMaintenance';
+const defaultService = BikeMaintenanceThreadService;
 
 route.post(
   basePath,
@@ -87,6 +83,34 @@ route.put(
     try {
       const entityResult = await service.update(id, req.body);
       return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.patch(
+  basePath + 'id',
+  isAuth,
+  attachUser,
+  celebrate({
+    body: Joi.object({
+      title: Joi.string().min(10).max(64),
+      content: Joi.string().min(10),
+      bikeBreakdown: Joi.number().min(0),
+    }),
+  }),
+  async (req, res, next) => {
+    const id = Number.parseInt(req.params.id);
+    const service = Container.get(defaultService);
+    try {
+      const previous = await service.findOne(id);
+      if (!previous) return res.status(400);
+      req.body.title = req.body.title || previous.title;
+      req.body.content = req.body.content || previous.content;
+      req.body.bikeBreakdown = req.body.bikeBreakdown || previous.bikeBreakdown;
+      const entityResult = await service.update(id, req.body);
+      return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
     }
