@@ -5,6 +5,7 @@ import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
 import { userRequest } from '../../types/userRequest';
 import BikeMaintenanceThreadService from '../services/BikeMaintenanceThreadService';
+import BikeModelService from "../services/BikeModelService";
 
 const route = Router();
 const paramsRules = celebrate({
@@ -72,8 +73,14 @@ route.delete(
     try {
       const service = Container.get(defaultService);
       const id = Number.parseInt(req.params.id);
-      const articles = await service.delete(id);
-      return res.status(204).json(articles);
+      const serviceBikeModel = Container.get(BikeModelService);
+      const model = await serviceBikeModel.getAllFromManufacturer(id);
+      if (model.length != 0)
+        return res
+          .status(403)
+          .json({ message: 'Impossible de supprimer ce constructeur' });
+      await service.delete(id);
+      return res.status(204);
     } catch (e) {
       return next(e);
     }

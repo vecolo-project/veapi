@@ -4,6 +4,8 @@ import { Role } from '../entities/User';
 import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
 import BikeService from '../services/BikeService';
+import RideService from "../services/RideService";
+import BikeMaintenanceThreadService from "../services/BikeMaintenanceThreadService";
 
 const route = Router();
 const paramsRules = celebrate({
@@ -67,9 +69,17 @@ route.delete(
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
+      const serviceRide = Container.get(RideService);
+      const serviceBikeMaintenance = Container.get(
+        BikeMaintenanceThreadService
+      );
       const id = Number.parseInt(req.params.id);
-      const articles = await service.delete(id);
-      return res.status(204).json(articles);
+      const thread = await serviceBikeMaintenance.getAllFromBike(id);
+      const rides = await serviceRide.getAllRideFromBike(id);
+      if (thread.length != 0 || rides.length != 0)
+        return res.status(403).json({message: 'Impossible de supprimer ce vélo'});
+      await service.delete(id);
+      return res.status(204);
     } catch (e) {
       return next(e);
     }

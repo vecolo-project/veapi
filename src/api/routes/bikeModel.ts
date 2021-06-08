@@ -4,6 +4,7 @@ import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
 import BikeModelService from '../services/BikeModelService';
+import BikeService from "../services/BikeService";
 
 const route = Router();
 const paramsRules = celebrate({
@@ -69,9 +70,15 @@ route.delete(
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
+      const serviceBike = Container.get(BikeService);
       const id = Number.parseInt(req.params.id);
-      const articles = await service.delete(id);
-      return res.status(204).json(articles);
+      const dependency = await serviceBike.getAllByModel(id);
+      if (dependency.length != 0)
+        return res
+          .status(403)
+          .json({ message: 'Impossible de supprimer ce model' });
+      await service.delete(id);
+      return res.status(204).json();
     } catch (e) {
       return next(e);
     }

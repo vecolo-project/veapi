@@ -73,8 +73,8 @@ route.delete(
     try {
       const service = Container.get(defaultService);
       const id = Number.parseInt(req.params.id);
-      const entityResult = await service.delete(id);
-      return res.status(204).json(entityResult);
+      await service.delete(id);
+      return res.status(204);
     } catch (e) {
       return next(e);
     }
