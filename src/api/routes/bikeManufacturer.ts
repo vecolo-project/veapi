@@ -1,19 +1,17 @@
 import { Router } from 'express';
-import { attachUser, checkRole, isAuth } from '../middlewares';
+import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
-import { userRequest } from '../../types/userRequest';
 import BikeModelService from '../services/BikeModelService';
 import BikeManufacturerService from '../services/BikeManufacturerService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    title: Joi.string().min(10).max(64).required(),
-    content: Joi.string().min(10).required(),
-    bikeBreakdown: Joi.number().min(0).required(),
-    user: Joi.number().min(0).required(),
+    name: Joi.string().min(10).max(64).required(),
+    phone: Joi.string().min(10).max(16).required(),
+    address: Joi.string().required(),
   }),
 });
 const basePath = '/bikeManufacturer';
@@ -22,17 +20,10 @@ const defaultService = BikeManufacturerService;
 route.post(
   basePath,
   isAuth,
-  attachUser,
-  celebrate({
-    body: Joi.object({
-      title: Joi.string().min(10).max(64).required(),
-      content: Joi.string().min(10).required(),
-      bikeBreakdown: Joi.number().min(0).required(),
-    }),
-  }),
-  async (req: userRequest, res, next) => {
+  checkRole(Role.STAFF),
+  paramsRules,
+  async (req, res, next) => {
     const service = Container.get(defaultService);
-    req.body.user = req.currentUser.id;
     try {
       const entityResult = await service.create(req.body);
       return res.status(201).json(entityResult);
