@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import CRUD from './CRUD';
+import CRUD, { getAllParams } from "./CRUD";
 import { Invoice, InvoiceRepository } from '../entities/Invoice';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
@@ -27,16 +27,16 @@ export default class InvoiceService extends CRUD<Invoice> {
         user: { id },
       },
     });
+  }
 
-    /*
-    return this.invoiceRepo
-      .createQueryBuilder('Invoice')
-      .where('createdAt BETWEEN :date_start AND date_end AND userId= :id', {
-        date_start: date_start,
-        date_end: date_end,
-        id: id,
-      })
-      .getMany();
-*/
+  async getAllFromUser(id: number, param: getAllParams): Promise<Invoice[]> {
+    return await this.invoiceRepo.find({
+      where: {
+        user: id,
+      },
+      take: param.limit,
+      skip: param.offset,
+      order: { createdAt: 'DESC' },
+    });
   }
 }

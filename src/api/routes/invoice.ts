@@ -3,9 +3,9 @@ import { attachUser, checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
-import { userRequest } from '../../types/userRequest';
 import BikeModelService from '../services/BikeModelService';
 import InvoiceService from '../services/InvoiceService';
+import { userRequest } from '../../types/userRequest';
 
 const route = Router();
 const paramsRules = celebrate({
@@ -22,10 +22,10 @@ const defaultService = InvoiceService;
 route.post(
   basePath,
   isAuth,
+  checkRole(Role.ADMIN),
   paramsRules,
-  async (req: userRequest, res, next) => {
+  async (req, res, next) => {
     const service = Container.get(defaultService);
-    req.body.user = req.currentUser.id;
     try {
       const entityResult = await service.create(req.body);
       return res.status(201).json(entityResult);
@@ -35,7 +35,7 @@ route.post(
   }
 );
 
-route.get(basePath, isAuth, async (req, res, next) => {
+route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -47,21 +47,26 @@ route.get(basePath, isAuth, async (req, res, next) => {
   }
 });
 
-route.get(basePath + ':id', isAuth, async (req, res, next) => {
-  try {
-    const service = Container.get(defaultService);
-    const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
-    return res.status(200).json(entityResult);
-  } catch (e) {
-    return next(e);
+route.get(
+  basePath + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
+      const entityResult = await service.findOne(id);
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
   }
-});
+);
 
 route.delete(
   basePath + ':id',
   isAuth,
-  checkRole(Role.STAFF),
+  checkRole(Role.ADMIN),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
@@ -91,6 +96,43 @@ route.put(
     try {
       const entityResult = await service.update(id, req.body);
       return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.get(
+  basePath + '/me',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const offset = req.body.offset || 0;
+      const limit = req.body.limit || 20;
+      const entityResult = await service.getAllFromUser(req.currentUser.id, {
+        offset,
+        limit,
+      });
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.get(
+  basePath + '/me/:id',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
+      const entityResult = await service.findOne(id);
+      if (entityResult.user.id != req.currentUser.id) return res.status(403);
+      return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
     }
