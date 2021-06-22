@@ -8,6 +8,8 @@ import {
   StationMonitoringRepository,
   StationMonitoringStatus,
 } from '../entities/StationMonitoring';
+import { Between } from 'typeorm';
+import { create } from 'domain';
 
 @Service()
 export default class StationMonitoringService extends CRUD<StationMonitoring> {
@@ -54,5 +56,19 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
         ...stationMonitoringProps,
       })
     );
+  }
+
+  async getMonitoringFromPeriod(
+    dateStart: Date,
+    dateEnd: Date
+  ): Promise<StationMonitoring[]> {
+    return this.repo.find({
+      where: {
+        createdAt: Between(dateStart, dateEnd),
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 }

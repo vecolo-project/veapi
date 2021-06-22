@@ -33,4 +33,15 @@ export default class RideService extends CRUD<Ride> {
       order: { createdAt: 'DESC' },
     });
   }
+
+  async getAllRideFromStation(
+    id: number,
+    param: getAllParams
+  ): Promise<Ride[] | null> {
+    return this.rideRepo.find({
+      where: [{ startStation: id }, { endStation: id }],
+      skip: param.offset,
+      take: param.limit,
+    });
+  }
 }

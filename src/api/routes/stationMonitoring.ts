@@ -7,13 +7,26 @@ import attachStation from '../middlewares/attachStation';
 import { StationRequest } from '../../types/stationRequest';
 import StationMonitoringService from '../services/StationMonitoringService';
 import {
-  StationMonitoring,
   StationMonitoringCreationProps,
   StationMonitoringStatus,
 } from '../entities/StationMonitoring';
 import { celebrate, Joi } from 'celebrate';
+import { checkRole, isAuth } from '../middlewares';
+import { Role } from '../entities/User';
 
 const route = Router();
+const paramsRules = celebrate({
+  body: Joi.object({
+    isActive: Joi.boolean().required(),
+    status: Joi.allow(['ACTIVE', 'MAINTAINING', 'OFF']).required(),
+    batteryPercent: Joi.number().min(0).max(100).required(),
+    chargingPower: Joi.number().min(0).required(),
+    usedBikeSlot: Joi.number().min(0).required(),
+    station: Joi.number().min(0).required(),
+  }),
+});
+const defaultService = StationMonitoringService;
+const basePath = '/stationMonitoring/';
 
 route.post(
   '/add-metric',
@@ -53,4 +66,108 @@ route.post(
     }
   }
 );
+
+route.post(
+  basePath,
+  isAuth,
+  checkRole(Role.ADMIN),
+  paramsRules,
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = req.body.offset || 0;
+    const limit = req.body.limit || 20;
+    const result = await service.find({ offset, limit });
+    return res.status(200).json(result);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+route.get(
+  basePath + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
+      const entityResult = await service.findOne(id);
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.delete(
+  basePath + ':id',
+  isAuth,
+  checkRole(Role.ADMIN),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
+      await service.delete(id);
+      return res.status(204);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.put(
+  basePath + ':id',
+  isAuth,
+  checkRole(Role.ADMIN),
+  paramsRules,
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    try {
+      const entityResult = await service.update(id, req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+//TODO group by X
+route.get(
+  basePath + 'period/',
+  isAuth,
+  checkRole(Role.STAFF),
+  celebrate({
+    body: Joi.object({
+      dateStart: Joi.date().required(),
+      dateEnd: Joi.date().required(),
+    }),
+  }),
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    try {
+      const entityResult = await service.getMonitoringFromPeriod(
+        req.body.dateStart,
+        req.body.dateEnd
+      );
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
 export default route;

@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Bike, BikeRepository, BikeStatus } from '../entities/Bike';
-import CRUD from './CRUD';
+import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { MoreThan } from 'typeorm';
@@ -28,6 +28,14 @@ export default class BikeService extends CRUD<Bike> {
         station: id,
         batteryPercent: MoreThan(this.batteryPercentCapToBeReady),
       },
+    });
+  }
+
+  async getAllFromStation(id: number, param: getAllParams): Promise<Bike[]> {
+    return this.repo.find({
+      where: { station: id },
+      skip: param.offset,
+      take: param.limit,
     });
   }
 }
