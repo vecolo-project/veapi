@@ -102,11 +102,26 @@ route.put(
   '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
-  paramsRules,
+  celebrate({
+    body: Joi.object({
+      firstName: Joi.string().min(1).required(),
+      lastName: Joi.string().min(1).required(),
+      birthDate: Joi.date().max('now').required(),
+      isActive: Joi.boolean().required(),
+      email: Joi.string().email().required(),
+      pseudo: Joi.string().min(7).required(),
+      newsletter: Joi.boolean().required(),
+      role: Joi.string()
+        .allow('ADMIN', 'CLIENT', 'STAFF', 'STATION')
+        .required(),
+    }),
+  }),
   async (req, res, next) => {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
     try {
+      const previous = await service.findOne(id);
+      req.body.password = previous.password;
       await service.update(id, req.body);
       const userUpdated = await service.findOne(id);
       return res.status(201).json(userUpdated);
@@ -141,5 +156,7 @@ route.post(
     }
   }
 );
+
+route.patch;
 
 export default route;
