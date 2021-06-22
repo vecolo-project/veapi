@@ -14,7 +14,7 @@ const paramsRules = celebrate({
     address: Joi.string().required(),
   }),
 });
-const basePath = '/bikeManufacturer';
+const basePath = '/bikeManufacturer/';
 const defaultService = BikeManufacturerService;
 
 route.post(

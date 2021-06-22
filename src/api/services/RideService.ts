@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import CRUD from './CRUD';
+import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { Ride, RideRepository } from '../entities/Ride';
@@ -15,9 +15,14 @@ export default class RideService extends CRUD<Ride> {
     super(rideRepo, logger);
   }
 
-  async getAllRideFromUser(id: number): Promise<Ride[] | null> {
+  async getAllRideFromUser(
+    id: number,
+    param: getAllParams
+  ): Promise<Ride[] | null> {
     return this.rideRepo.find({
       where: { user: id },
+      skip: param.offset,
+      take: param.limit,
       order: { createdAt: 'DESC' },
     });
   }

@@ -4,7 +4,7 @@ import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
 import BikeModelService from '../services/BikeModelService';
-import BikeService from "../services/BikeService";
+import BikeService from '../services/BikeService';
 
 const route = Router();
 const paramsRules = celebrate({
@@ -21,7 +21,7 @@ const paramsRules = celebrate({
     bikeManufacturer: Joi.number().min(0).required(),
   }),
 });
-const basePath = '/bikeModel';
+const basePath = '/bikeModel/';
 const defaultService = BikeModelService;
 
 route.post(

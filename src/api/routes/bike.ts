@@ -20,7 +20,7 @@ const paramsRules = celebrate({
       .required(),
   }),
 });
-const basePath = '/bike';
+const basePath = '/bike/';
 const defaultService = BikeService;
 
 route.post(

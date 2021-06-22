@@ -1,28 +1,56 @@
 import { Router } from 'express';
+import { celebrate, Joi } from 'celebrate';
 import { attachUser, checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
-import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
-import BikeModelService from '../services/BikeModelService';
-import InvoiceService from '../services/InvoiceService';
+import IssueService from '../services/IssueService';
 import { userRequest } from '../../types/userRequest';
+import { IssueStatus } from '../entities/Issue';
+import IssueThreadService from '../services/IssueThreadService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    billingDate: Joi.date().required(),
-    amount: Joi.number().min(0).required(),
-    subscription: Joi.number().min(0).required(),
-    user: Joi.number().min(0).required(),
+    title: Joi.string().min(1).max(64).required(),
+    content: Joi.string().min(1).required(),
+    attachedFiles: Joi.string().optional(),
+    type: Joi.string().allow(['BIKE', 'STATION']).required(),
+    status: Joi.string().allow(['CREATED', 'DONE', 'IN PROGRESS']).required(),
+    creator: Joi.number().min(1).required(),
   }),
 });
-const basePath = '/invoice/';
-const defaultService = InvoiceService;
+const basePath = '/issue/';
+const defaultService = IssueService;
+
+route.post(
+  basePath + 'report/',
+  isAuth,
+  attachUser,
+  celebrate({
+    body: Joi.object({
+      title: Joi.string().min(1).max(64).required(),
+      content: Joi.string().min(1).required(),
+      attachedFiles: Joi.string().optional(),
+      type: Joi.string().allow(['BIKE', 'STATION']).required(),
+    }),
+  }),
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    req.body.creator = req.currentUser.id;
+    req.body.status = IssueStatus.CREATED;
+    try {
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
 
 route.post(
   basePath,
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);
@@ -66,17 +94,17 @@ route.get(
 route.delete(
   basePath + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
       const id = Number.parseInt(req.params.id);
-      const serviceBikeModel = Container.get(BikeModelService);
-      const model = await serviceBikeModel.getAllFromManufacturer(id);
-      if (model.length != 0)
+      const dependencyService = Container.get(IssueThreadService);
+      const dependency = await dependencyService.getAllFromIssue(id);
+      if (dependency.length != 0)
         return res
           .status(403)
-          .json({ message: 'Impossible de supprimer ce constructeur' });
+          .json({ message: 'Impossible de supprimer ce report' });
       await service.delete(id);
       return res.status(204);
     } catch (e) {
@@ -96,43 +124,6 @@ route.put(
     try {
       const entityResult = await service.update(id, req.body);
       return res.status(201).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
-
-route.get(
-  basePath + 'me/',
-  isAuth,
-  attachUser,
-  async (req: userRequest, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const offset = req.body.offset || 0;
-      const limit = req.body.limit || 20;
-      const entityResult = await service.getAllFromUser(req.currentUser.id, {
-        offset,
-        limit,
-      });
-      return res.status(200).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
-
-route.get(
-  basePath + 'me/:id',
-  isAuth,
-  attachUser,
-  async (req: userRequest, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const id = Number.parseInt(req.params.id);
-      const entityResult = await service.findOne(id);
-      if (entityResult.user.id != req.currentUser.id) return res.status(403);
-      return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
     }

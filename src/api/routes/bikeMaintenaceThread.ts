@@ -14,7 +14,7 @@ const paramsRules = celebrate({
     user: Joi.number().min(0).required(),
   }),
 });
-const basePath = '/bikeMaintenance';
+const basePath = '/bikeMaintenance/';
 const defaultService = BikeMaintenanceThreadService;
 
 route.post(
