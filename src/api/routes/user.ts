@@ -18,9 +18,7 @@ const paramsRules = celebrate({
     password: Joi.string().min(7).required(),
     pseudo: Joi.string().min(7).required(),
     newsletter: Joi.boolean().required(),
-    role: Joi.string()
-      .allow('ADMIN', 'CLIENT', 'STAFF', 'STATION')
-      .required(),
+    role: Joi.string().allow('ADMIN', 'CLIENT', 'STAFF', 'STATION').required(),
   }),
 });
 const defaultService = UserService;
@@ -34,10 +32,11 @@ route.get(
     logger.debug('Calling GET /user endpoint');
     try {
       const userServiceInstance = Container.get(UserService);
-      const offset = req.body.offset || 0;
-      const limit = req.body.limit || 20;
+      const offset = Number(req.query.offset) || 0;
+      const limit = Number(req.query.limit) || 20;
       const users = await userServiceInstance.find({ offset, limit });
-      return res.json(users).status(200);
+      const count = await userServiceInstance.getRepo().count();
+      return res.json({ users, count }).status(200);
     } catch (e) {
       return next(e);
     }
