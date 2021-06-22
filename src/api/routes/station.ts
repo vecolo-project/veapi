@@ -4,9 +4,26 @@ import {Container} from 'typedi';
 import {checkRole, isAuth} from '../middlewares';
 import {Role} from '../entities/User';
 import StationService from '../services/StationService';
-import {Station} from '../entities/Station';
+import { Station } from '../entities/Station';
+import { celebrate, Joi } from 'celebrate';
+import RideService from '../services/RideService';
+import BikeService from '../services/BikeService';
 
 const route = Router();
+
+const paramsRules = celebrate({
+  body: Joi.object({
+    batteryCapacity: Joi.number().min(0).required(),
+    bikeCapacity: Joi.number().min(0).required(),
+    streetNumber: Joi.number().min(0).required(),
+    streetName: Joi.string().min(1).required(),
+    city: Joi.string().min(1).required(),
+    zipcode: Joi.string().min(5).max(5).required(),
+    coordinateX: Joi.number().required(),
+    coordinateY: Joi.number().required(),
+  }),
+});
+const defaultService = StationService;
 
 route.get(
     '/generate-token/:stationId',
@@ -28,21 +45,99 @@ route.get(
     }
 );
 
-route.get('/',
-    async (req: Request, res: Response, next: NextFunction) => {
-        const logger: Logger = Container.get('logger');
-        logger.debug('Calling GET /station/ endpoint');
-        try {
-            const limit = Number(req.query.limit) | 100;
-            const offset = Number(req.query.offset) | 0;
-            const stationServiceInstance = Container.get(StationService);
-            const stations: Station[] = await stationServiceInstance.findAll({limit, offset});
-            return res
-                .json(stations)
-                .status(200);
-        } catch (e) {
-            return next(e);
-        }
+route.post(
+  '/',
+  isAuth,
+  checkRole(Role.ADMIN),
+  paramsRules,
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
     }
+  }
 );
+
+route.get('/', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = req.body.offset || 0;
+    const limit = req.body.limit || 20;
+    const result = await service.find({ offset, limit });
+    return res.status(200).json(result);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+route.get('/' + ':id', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.findOne(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+route.delete(
+  '/' + ':id',
+  isAuth,
+  checkRole(Role.ADMIN),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const bikeService = Container.get(BikeService);
+      const id = Number.parseInt(req.params.id);
+      const bikes = await bikeService.getAllFromStation(id, {
+        limit: 1,
+        offset: 0,
+      });
+      if (bikes.length > 0) {
+        res
+          .status(403)
+          .json({ message: 'Impossible de supprimer cette station' });
+        return;
+      }
+      const rideService = Container.get(RideService);
+      const rides = await rideService.getAllRideFromStation(id, {
+        limit: 1,
+        offset: 0,
+      });
+      if (rides.length > 0) {
+        res
+          .status(403)
+          .json({ message: 'Impossible de supprimer cette station' });
+        return;
+      }
+
+      await service.delete(id);
+      return res.status(204);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.put(
+  '/' + ':id',
+  isAuth,
+  checkRole(Role.ADMIN),
+  paramsRules,
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    try {
+      const entityResult = await service.update(id, req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
 export default route;

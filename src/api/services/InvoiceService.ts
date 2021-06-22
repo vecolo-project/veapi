@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import CRUD, { getAllParams } from "./CRUD";
+import CRUD, { getAllParams } from './CRUD';
 import { Invoice, InvoiceRepository } from '../entities/Invoice';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
@@ -33,6 +33,20 @@ export default class InvoiceService extends CRUD<Invoice> {
     return await this.invoiceRepo.find({
       where: {
         user: id,
+      },
+      take: param.limit,
+      skip: param.offset,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getAllFromSubscription(
+    id: number,
+    param: getAllParams
+  ): Promise<Invoice[]> {
+    return await this.invoiceRepo.find({
+      where: {
+        subscription: id,
       },
       take: param.limit,
       skip: param.offset,

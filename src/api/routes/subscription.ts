@@ -1,22 +1,23 @@
 import { Router } from 'express';
+import { celebrate, Joi } from 'celebrate';
 import { attachUser, checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
-import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
-import BikeModelService from '../services/BikeModelService';
-import InvoiceService from '../services/InvoiceService';
+import SubscriptionService from '../services/SubscriptionService';
 import { userRequest } from '../../types/userRequest';
+import InvoiceService from '../services/InvoiceService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    billingDate: Joi.date().required(),
-    amount: Joi.number().min(0).required(),
-    subscription: Joi.number().min(0).required(),
+    startDate: Joi.date().required(),
+    monthDuration: Joi.number().min(1).required(),
+    autoRenew: Joi.boolean().required(),
+    plan: Joi.number().min(0).required(),
     user: Joi.number().min(0).required(),
   }),
 });
-const defaultService = InvoiceService;
+const defaultService = SubscriptionService;
 
 route.post(
   '/',
@@ -39,8 +40,8 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
     const limit = req.body.limit || 20;
-    const entityResult = await service.find({ offset, limit });
-    return res.status(200).json(entityResult);
+    const result = await service.find({ offset, limit });
+    return res.status(200).json(result);
   } catch (e) {
     return next(e);
   }
@@ -69,13 +70,18 @@ route.delete(
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
+      const dependencyService = Container.get(InvoiceService);
       const id = Number.parseInt(req.params.id);
-      const serviceBikeModel = Container.get(BikeModelService);
-      const model = await serviceBikeModel.getAllFromManufacturer(id);
-      if (model.length != 0)
-        return res
+      const dependency = await dependencyService.getAllFromSubscription(id, {
+        limit: 1,
+        offset: 0,
+      });
+      if (dependency.length > 0) {
+        res
           .status(403)
-          .json({ message: 'Impossible de supprimer ce constructeur' });
+          .json({ message: 'Impossible de supprimer cette inscription' });
+        return;
+      }
       await service.delete(id);
       return res.status(204);
     } catch (e) {
@@ -87,7 +93,7 @@ route.delete(
 route.put(
   '/' + ':id',
   isAuth,
-  checkRole(Role.STAFF),
+  checkRole(Role.ADMIN),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);
@@ -110,11 +116,8 @@ route.get(
       const service = Container.get(defaultService);
       const offset = req.body.offset || 0;
       const limit = req.body.limit || 20;
-      const entityResult = await service.getAllFromUser(req.currentUser.id, {
-        offset,
-        limit,
-      });
-      return res.status(200).json(entityResult);
+      const result = await service.find({ offset, limit });
+      return res.status(200).json(result);
     } catch (e) {
       return next(e);
     }
@@ -124,14 +127,64 @@ route.get(
 route.get(
   '/' + 'me/:id',
   isAuth,
-  attachUser,
-  async (req: userRequest, res, next) => {
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
       const id = Number.parseInt(req.params.id);
       const entityResult = await service.findOne(id);
-      if (entityResult.user.id != req.currentUser.id) return res.status(403);
       return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.post(
+  '/' + 'add/',
+  isAuth,
+  attachUser,
+  celebrate({
+    body: Joi.object({
+      startDate: Joi.date().required(),
+      monthDuration: Joi.number().min(1).required(),
+      autoRenew: Joi.boolean().required(),
+      plan: Joi.number().min(0).required(),
+    }),
+  }),
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      req.body.user = req.currentUser.id;
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.patch(
+  '/' + 'cancel/:id',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    try {
+      const previous = await service.findOne(id);
+      if (previous.user.id != req.currentUser.id) {
+        res.status(401);
+        return;
+      }
+      previous.autoRenew = false;
+      previous.monthDuration =
+        (Date.prototype.getFullYear() - previous.createdAt.getFullYear()) * 12 -
+        Date.prototype.getMonth() +
+        previous.createdAt.getMonth() +
+        1;
+      const entityResult = await service.update(id, previous);
+      return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
     }

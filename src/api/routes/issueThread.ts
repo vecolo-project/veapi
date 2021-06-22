@@ -1,29 +1,76 @@
 import { Router } from 'express';
-import { celebrate, Joi } from 'celebrate';
-import { checkRole, isAuth } from '../middlewares';
+import { attachUser, checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
+import { celebrate, Joi } from 'celebrate';
 import { Container } from 'typedi';
-import BikeMaintenanceThreadService from '../services/BikeMaintenanceThreadService';
+import IssueThreadService from '../services/IssueThreadService';
+import { userRequest } from '../../types/userRequest';
+import IssueService from '../services/IssueService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    title: Joi.string().min(10).max(64).required(),
-    content: Joi.string().min(10).required(),
-    bikeBreakdown: Joi.number().min(0).required(),
-    user: Joi.number().min(0).required(),
+    content: Joi.string().min(1).required(),
+    issue: Joi.number().min(0).required(),
   }),
 });
-const defaultService = BikeMaintenanceThreadService;
+const defaultService = IssueThreadService;
 
 route.post(
   '/',
   isAuth,
   checkRole(Role.STAFF),
+  attachUser,
   paramsRules,
-  async (req, res, next) => {
+  async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
+    req.body.author = req.currentUser.id;
     try {
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.post(
+  '/' + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  attachUser,
+  paramsRules,
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    req.body.author = req.currentUser.id;
+    const id = Number.parseInt(req.params.id);
+    req.body.issue = id;
+    try {
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.post(
+  '/' + 'message/:id',
+  isAuth,
+  attachUser,
+  paramsRules,
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    req.body.author = req.currentUser.id;
+    const id = Number.parseInt(req.params.id);
+    req.body.issue = id;
+    try {
+      const issueService = Container.get(IssueService);
+      const thread = await issueService.findOne(id);
+      if (thread.id != req.currentUser.id) {
+        res.status(403);
+        return;
+      }
       const entityResult = await service.create(req.body);
       return res.status(201).json(entityResult);
     } catch (e) {
@@ -87,34 +134,6 @@ route.put(
     try {
       const entityResult = await service.update(id, req.body);
       return res.status(201).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
-
-route.patch(
-  '/' + 'id',
-  isAuth,
-  checkRole(Role.STAFF),
-  celebrate({
-    body: Joi.object({
-      title: Joi.string().min(10).max(64),
-      content: Joi.string().min(10),
-      bikeBreakdown: Joi.number().min(0),
-    }),
-  }),
-  async (req, res, next) => {
-    const id = Number.parseInt(req.params.id);
-    const service = Container.get(defaultService);
-    try {
-      const previous = await service.findOne(id);
-      if (!previous) return res.status(400);
-      req.body.title = req.body.title || previous.title;
-      req.body.content = req.body.content || previous.content;
-      req.body.bikeBreakdown = req.body.bikeBreakdown || previous.bikeBreakdown;
-      const entityResult = await service.update(id, req.body);
-      return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
     }

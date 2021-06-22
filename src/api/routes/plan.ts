@@ -3,30 +3,24 @@ import { celebrate, Joi } from 'celebrate';
 import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
-import BikeModelService from '../services/BikeModelService';
-import BikeService from '../services/BikeService';
+import PlanService from '../services/PlanService';
+import SubscriptionService from '../services/SubscriptionService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    name: Joi.string().max(32).required(),
-    batteryCapacity: Joi.number().min(0).required(),
-    weight: Joi.number().min(0).required(),
-    maxPower: Joi.number().min(0).required(),
-    maxSpeed: Joi.number().min(0).required(),
-    maxDistance: Joi.number().min(0).required(),
-    description: Joi.string().required(),
-    image: Joi.string().required(),
-    icon: Joi.string().required(),
-    bikeManufacturer: Joi.number().min(0).required(),
+    name: Joi.string().max(32).min(10).required(),
+    price: Joi.number().required(),
+    costPerMinute: Joi.number().required(),
+    isUnlimited: Joi.boolean().required(),
   }),
 });
-const defaultService = BikeModelService;
+const defaultService = PlanService;
 
 route.post(
   '/',
   isAuth,
-  checkRole(Role.STAFF),
+  checkRole(Role.ADMIN),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);
@@ -44,8 +38,8 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
     const limit = req.body.limit || 20;
-    const entityResult = await service.find({ offset, limit });
-    return res.status(200).json(entityResult);
+    const result = await service.find({ offset, limit });
+    return res.status(200).json(result);
   } catch (e) {
     return next(e);
   }
@@ -65,19 +59,24 @@ route.get('/' + ':id', async (req, res, next) => {
 route.delete(
   '/' + ':id',
   isAuth,
-  checkRole(Role.STAFF),
+  checkRole(Role.ADMIN),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
-      const serviceBike = Container.get(BikeService);
+      const dependencyService = Container.get(SubscriptionService);
       const id = Number.parseInt(req.params.id);
-      const dependency = await serviceBike.getAllByModel(id);
-      if (dependency.length != 0)
-        return res
+      const dependency = await dependencyService.getAllFromPlan(id, {
+        limit: 1,
+        offset: 0,
+      });
+      if (dependency.length > 0) {
+        res
           .status(403)
-          .json({ message: 'Impossible de supprimer ce model' });
+          .json({ message: 'Impossible de supprimmer ce forfait' });
+        return;
+      }
       await service.delete(id);
-      return res.status(204).json();
+      return res.status(204);
     } catch (e) {
       return next(e);
     }
@@ -87,7 +86,7 @@ route.delete(
 route.put(
   '/' + ':id',
   isAuth,
-  checkRole(Role.STAFF),
+  checkRole(Role.ADMIN),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);

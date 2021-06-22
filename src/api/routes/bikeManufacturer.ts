@@ -14,11 +14,10 @@ const paramsRules = celebrate({
     address: Joi.string().required(),
   }),
 });
-const basePath = '/bikeManufacturer';
 const defaultService = BikeManufacturerService;
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,
@@ -33,7 +32,7 @@ route.post(
   }
 );
 
-route.get(basePath, isAuth, async (req, res, next) => {
+route.get('/', isAuth, async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -45,7 +44,7 @@ route.get(basePath, isAuth, async (req, res, next) => {
   }
 });
 
-route.get(basePath + ':id', isAuth, async (req, res, next) => {
+route.get('/' + ':id', isAuth, async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
@@ -57,7 +56,7 @@ route.get(basePath + ':id', isAuth, async (req, res, next) => {
 });
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -79,7 +78,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,
