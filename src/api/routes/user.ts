@@ -19,7 +19,7 @@ const paramsRules = celebrate({
     pseudo: Joi.string().min(7).required(),
     newsletter: Joi.boolean().required(),
     role: Joi.string()
-      .allow(['ADMIN', 'CLIENT', 'STAFF', 'STATION'])
+      .allow('ADMIN', 'CLIENT', 'STAFF', 'STATION')
       .required(),
   }),
 });

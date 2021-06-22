@@ -18,7 +18,7 @@ const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
     isActive: Joi.boolean().required(),
-    status: Joi.allow(['ACTIVE', 'MAINTAINING', 'OFF']).required(),
+    status: Joi.string().allow('ACTIVE', 'MAINTAINING', 'OFF').required(),
     batteryPercent: Joi.number().min(0).max(100).required(),
     chargingPower: Joi.number().min(0).required(),
     usedBikeSlot: Joi.number().min(0).required(),

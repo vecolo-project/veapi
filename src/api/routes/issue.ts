@@ -14,8 +14,8 @@ const paramsRules = celebrate({
     title: Joi.string().min(1).max(64).required(),
     content: Joi.string().min(1).required(),
     attachedFiles: Joi.string().optional(),
-    type: Joi.string().allow(['BIKE', 'STATION']).required(),
-    status: Joi.string().allow(['CREATED', 'DONE', 'IN PROGRESS']).required(),
+    type: Joi.string().allow('BIKE', 'STATION').required(),
+    status: Joi.string().allow('CREATED', 'DONE', 'IN PROGRESS').required(),
     creator: Joi.number().min(1).required(),
   }),
 });
@@ -30,7 +30,7 @@ route.post(
       title: Joi.string().min(1).max(64).required(),
       content: Joi.string().min(1).required(),
       attachedFiles: Joi.string().optional(),
-      type: Joi.string().allow(['BIKE', 'STATION']).required(),
+      type: Joi.string().allow('BIKE', 'STATION').required(),
     }),
   }),
   async (req: userRequest, res, next) => {
