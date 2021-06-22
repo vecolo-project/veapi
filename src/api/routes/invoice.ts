@@ -37,8 +37,8 @@ route.post(
 route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
-    const offset = req.body.offset || 0;
-    const limit = req.body.limit || 20;
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
     const entityResult = await service.find({ offset, limit });
     return res.status(200).json(entityResult);
   } catch (e) {
@@ -108,8 +108,8 @@ route.get(
   async (req: userRequest, res, next) => {
     try {
       const service = Container.get(defaultService);
-      const offset = req.body.offset || 0;
-      const limit = req.body.limit || 20;
+      const offset = Number(req.query.offset) || 0;
+      const limit = Number(req.query.limit) || 20;
       const entityResult = await service.getAllFromUser(req.currentUser.id, {
         offset,
         limit,
