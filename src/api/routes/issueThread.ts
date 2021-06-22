@@ -14,11 +14,10 @@ const paramsRules = celebrate({
     issue: Joi.number().min(0).required(),
   }),
 });
-const basePath = '/issueThread/';
 const defaultService = IssueThreadService;
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.STAFF),
   attachUser,
@@ -36,7 +35,7 @@ route.post(
 );
 
 route.post(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   attachUser,
@@ -56,7 +55,7 @@ route.post(
 );
 
 route.post(
-  basePath + 'message/:id',
+  '/' + 'message/:id',
   isAuth,
   attachUser,
   paramsRules,
@@ -80,7 +79,7 @@ route.post(
   }
 );
 
-route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -93,7 +92,7 @@ route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
 });
 
 route.get(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -109,7 +108,7 @@ route.get(
 );
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -125,7 +124,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,

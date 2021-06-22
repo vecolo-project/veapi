@@ -20,11 +20,10 @@ const paramsRules = celebrate({
       .required(),
   }),
 });
-const basePath = '/bike/';
 const defaultService = BikeService;
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,
@@ -39,7 +38,7 @@ route.post(
   }
 );
 
-route.get(basePath, async (req, res, next) => {
+route.get('/', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -51,7 +50,7 @@ route.get(basePath, async (req, res, next) => {
   }
 });
 
-route.get(basePath + ':id', async (req, res, next) => {
+route.get('/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
@@ -63,7 +62,7 @@ route.get(basePath + ':id', async (req, res, next) => {
 });
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -89,7 +88,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,

@@ -19,11 +19,10 @@ const paramsRules = celebrate({
     creator: Joi.number().min(1).required(),
   }),
 });
-const basePath = '/issue/';
 const defaultService = IssueService;
 
 route.post(
-  basePath + 'report/',
+  '/' + 'report/',
   isAuth,
   attachUser,
   celebrate({
@@ -48,7 +47,7 @@ route.post(
 );
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,
@@ -63,7 +62,7 @@ route.post(
   }
 );
 
-route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -76,7 +75,7 @@ route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
 });
 
 route.get(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -92,7 +91,7 @@ route.get(
 );
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -114,7 +113,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,

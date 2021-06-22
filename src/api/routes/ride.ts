@@ -18,9 +18,8 @@ const paramsRules = celebrate({
   }),
 });
 const defaultService = RideService;
-const basePath = '/ride/';
 
-route.post(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+route.post('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   const service = Container.get(defaultService);
   try {
     const entityResult = await service.create(req.body);
@@ -30,7 +29,7 @@ route.post(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   }
 });
 
-route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -43,7 +42,7 @@ route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
 });
 
 route.get(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -59,7 +58,7 @@ route.get(
 );
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
   async (req, res, next) => {
@@ -75,7 +74,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,
@@ -92,7 +91,7 @@ route.put(
 );
 
 route.post(
-  basePath + 'order/',
+  '/' + 'order/',
   isAuth,
   attachUser,
   celebrate({
@@ -118,7 +117,7 @@ route.post(
 );
 
 route.patch(
-  basePath + 'order/:id',
+  '/' + 'order/:id',
   isAuth,
   attachUser,
   celebrate({
@@ -147,7 +146,7 @@ route.patch(
 );
 
 route.get(
-  basePath + 'me/:id',
+  '/' + 'me/:id',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {
@@ -167,7 +166,7 @@ route.get(
 );
 
 route.get(
-  basePath + 'me/',
+  '/' + 'me/',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {

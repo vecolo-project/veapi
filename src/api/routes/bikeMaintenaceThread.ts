@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { celebrate, Joi } from 'celebrate';
-import { attachUser, checkRole, isAuth } from '../middlewares';
+import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
 import BikeMaintenanceThreadService from '../services/BikeMaintenanceThreadService';
@@ -14,11 +14,10 @@ const paramsRules = celebrate({
     user: Joi.number().min(0).required(),
   }),
 });
-const basePath = '/bikeMaintenance/';
 const defaultService = BikeMaintenanceThreadService;
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,
@@ -33,7 +32,7 @@ route.post(
   }
 );
 
-route.get(basePath, async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -45,19 +44,24 @@ route.get(basePath, async (req, res, next) => {
   }
 });
 
-route.get(basePath + ':id', async (req, res, next) => {
-  try {
-    const service = Container.get(defaultService);
-    const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
-    return res.status(200).json(entityResult);
-  } catch (e) {
-    return next(e);
+route.get(
+  '/' + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
+      const entityResult = await service.findOne(id);
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
   }
-});
+);
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -73,7 +77,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   paramsRules,
@@ -90,9 +94,9 @@ route.put(
 );
 
 route.patch(
-  basePath + 'id',
+  '/' + 'id',
   isAuth,
-  attachUser,
+  checkRole(Role.STAFF),
   celebrate({
     body: Joi.object({
       title: Joi.string().min(10).max(64),

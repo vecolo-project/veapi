@@ -26,7 +26,6 @@ const paramsRules = celebrate({
   }),
 });
 const defaultService = StationMonitoringService;
-const basePath = '/stationMonitoring/';
 
 route.post(
   '/add-metric',
@@ -68,7 +67,7 @@ route.post(
 );
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,
@@ -83,7 +82,7 @@ route.post(
   }
 );
 
-route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -96,7 +95,7 @@ route.get(basePath, isAuth, checkRole(Role.STAFF), async (req, res, next) => {
 });
 
 route.get(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -112,7 +111,7 @@ route.get(
 );
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
   async (req, res, next) => {
@@ -128,7 +127,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,
@@ -146,7 +145,7 @@ route.put(
 
 //TODO group by X
 route.get(
-  basePath + 'period/',
+  '/' + 'period/',
   isAuth,
   checkRole(Role.STAFF),
   celebrate({

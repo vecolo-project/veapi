@@ -1,27 +1,25 @@
 import { Router } from 'express';
 import { celebrate, Joi } from 'celebrate';
-import { checkRole, isAuth } from '../middlewares';
+import { attachUser, checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
-import PlanService from '../services/PlanService';
-import SubscriptionService from '../services/SubscriptionService';
+import StationMaintenanceThreadService from '../services/StationMaintenanceThreadService';
 
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    name: Joi.string().max(32).min(10).required(),
-    price: Joi.number().required(),
-    costPerMinute: Joi.number().required(),
-    isUnlimited: Joi.boolean().required(),
+    title: Joi.string().min(10).max(64).required(),
+    content: Joi.string().min(10).required(),
+    stationBreakdown: Joi.number().min(0).required(),
+    user: Joi.number().min(0).required(),
   }),
 });
-const defaultService = PlanService;
-const basePath = '/plan/';
+const defaultService = StationMaintenanceThreadService;
 
 route.post(
-  basePath,
+  '/',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);
@@ -34,48 +32,42 @@ route.post(
   }
 );
 
-route.get(basePath, async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
     const limit = req.body.limit || 20;
-    const result = await service.find({ offset, limit });
-    return res.status(200).json(result);
-  } catch (e) {
-    return next(e);
-  }
-});
-
-route.get(basePath + ':id', async (req, res, next) => {
-  try {
-    const service = Container.get(defaultService);
-    const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
+    const entityResult = await service.find({ offset, limit });
     return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);
   }
 });
 
-route.delete(
-  basePath + ':id',
+route.get(
+  '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
-      const dependencyService = Container.get(SubscriptionService);
       const id = Number.parseInt(req.params.id);
-      const dependency = await dependencyService.getAllFromPlan(id, {
-        limit: 1,
-        offset: 0,
-      });
-      if (dependency.length > 0) {
-        res
-          .status(403)
-          .json({ message: 'Impossible de supprimmer ce forfait' });
-        return;
-      }
+      const entityResult = await service.findOne(id);
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.delete(
+  '/' + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
       await service.delete(id);
       return res.status(204);
     } catch (e) {
@@ -85,9 +77,9 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);

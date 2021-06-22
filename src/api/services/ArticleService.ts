@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import CRUD, { getAllParams } from "./CRUD";
+import CRUD, { getAllParams } from './CRUD';
 import { Article, ArticleRepository } from '../entities/Article';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';

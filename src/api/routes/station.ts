@@ -24,7 +24,6 @@ const paramsRules = celebrate({
   }),
 });
 const defaultService = StationService;
-const basePath = '/station/';
 
 route.get(
   '/generate-token/:stationId',
@@ -47,7 +46,7 @@ route.get(
 );
 
 route.post(
-  basePath,
+  '/',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,
@@ -62,7 +61,7 @@ route.post(
   }
 );
 
-route.get(basePath, async (req, res, next) => {
+route.get('/', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
@@ -74,7 +73,7 @@ route.get(basePath, async (req, res, next) => {
   }
 });
 
-route.get(basePath + ':id', async (req, res, next) => {
+route.get('/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
@@ -86,7 +85,7 @@ route.get(basePath + ':id', async (req, res, next) => {
 });
 
 route.delete(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
   async (req, res, next) => {
@@ -125,7 +124,7 @@ route.delete(
 );
 
 route.put(
-  basePath + ':id',
+  '/' + ':id',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,

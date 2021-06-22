@@ -11,7 +11,7 @@ import {
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { validate } from 'class-validator';
-import CRUD from './CRUD';
+import CRUD, { getAllParams } from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 @Service()
@@ -89,8 +89,11 @@ export default class UserService extends CRUD<User> {
     );
   }
 
-  async find(): Promise<User[]> {
-    const users = await this.repo.find();
+  async find(params: getAllParams): Promise<User[]> {
+    const users = await this.repo.find({
+      take: params.limit,
+      skip: params.offset,
+    });
     for (const user of users) {
       Reflect.deleteProperty(user, 'password');
     }
