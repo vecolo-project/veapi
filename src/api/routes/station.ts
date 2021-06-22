@@ -1,8 +1,8 @@
-import {NextFunction, Request, Response, Router} from 'express';
-import {Logger} from 'winston';
-import {Container} from 'typedi';
-import {checkRole, isAuth} from '../middlewares';
-import {Role} from '../entities/User';
+import { NextFunction, Request, Response, Router } from 'express';
+import { Logger } from 'winston';
+import { Container } from 'typedi';
+import { checkRole, isAuth } from '../middlewares';
+import { Role } from '../entities/User';
 import StationService from '../services/StationService';
 import { Station } from '../entities/Station';
 import { celebrate, Joi } from 'celebrate';
@@ -26,23 +26,23 @@ const paramsRules = celebrate({
 const defaultService = StationService;
 
 route.get(
-    '/generate-token/:stationId',
-    isAuth,
-    checkRole(Role.ADMIN),
-    async (req: Request, res: Response, next: NextFunction) => {
-        const logger: Logger = Container.get('logger');
-        logger.debug('Calling GET /station/generate-token endpoint');
-        try {
-            const stationId = Number.parseInt(req.params.stationId);
-            const stationServiceInstance = Container.get(StationService);
-            const station: Station = await stationServiceInstance.findOne(stationId);
-            return res
-                .json(stationServiceInstance.generateToken(station))
-                .status(200);
-        } catch (e) {
-            return next(e);
-        }
+  '/generate-token/:stationId',
+  isAuth,
+  checkRole(Role.ADMIN),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling GET /station/generate-token endpoint');
+    try {
+      const stationId = Number.parseInt(req.params.stationId);
+      const stationServiceInstance = Container.get(StationService);
+      const station: Station = await stationServiceInstance.findOne(stationId);
+      return res
+        .json(stationServiceInstance.generateToken(station))
+        .status(200);
+    } catch (e) {
+      return next(e);
     }
+  }
 );
 
 route.post(
@@ -66,7 +66,7 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = req.body.offset || 0;
     const limit = req.body.limit || 20;
-    const result = await service.find({ offset, limit });
+    const result = await service.findAll({ offset, limit });
     return res.status(200).json(result);
   } catch (e) {
     return next(e);
