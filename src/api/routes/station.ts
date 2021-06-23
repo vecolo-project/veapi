@@ -77,7 +77,7 @@ route.get('/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
+    const entityResult = await service.getOne(id);
     return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);

@@ -41,4 +41,18 @@ export default class StationService extends CRUD<Station> {
     }
     return stations;
   }
+  async getOne(id: number): Promise<Station | undefined> {
+    const station: Station = await this.findOne(id);
+    if (station) {
+      const monitoring: StationMonitoring = await this.stationMonitoringService.findLast(
+        station.id
+      );
+      if (monitoring) {
+        station.stationMonitoring = [monitoring];
+      } else {
+        station.stationMonitoring = [];
+      }
+    }
+    return station;
+  }
 }
