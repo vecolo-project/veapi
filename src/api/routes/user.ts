@@ -6,6 +6,7 @@ import UserService from '../services/UserService';
 import { userRequest } from '../../types/userRequest';
 import { Role } from '../entities/User';
 import { celebrate, Joi } from 'celebrate';
+import bcrypt from 'bcrypt';
 
 const route = Router();
 const paramsRules = celebrate({
@@ -57,6 +58,7 @@ route.post(
   async (req, res, next) => {
     const service = Container.get(defaultService);
     try {
+      req.body.password = await bcrypt.hash(req.body.password, 12);
       const entityResult = await service.create(req.body);
       return res.status(201).json(entityResult);
     } catch (e) {
@@ -108,6 +110,7 @@ route.put(
       lastName: Joi.string().min(1).required(),
       birthDate: Joi.date().max('now').required(),
       isActive: Joi.boolean().required(),
+      password: Joi.string().min(7),
       email: Joi.string().email().required(),
       pseudo: Joi.string().min(7).required(),
       newsletter: Joi.boolean().required(),
@@ -121,7 +124,9 @@ route.put(
     const id = Number.parseInt(req.params.id);
     try {
       const previous = await service.findOne(id);
-      req.body.password = previous.password;
+      //todo
+      if (req.body.password != undefined)
+        req.body.password = await bcrypt.hash(req.body.password, 12);
       await service.update(id, req.body);
       const userUpdated = await service.findOne(id);
       return res.status(201).json(userUpdated);
@@ -131,25 +136,34 @@ route.put(
   }
 );
 
-route.post(
-  '/register/',
+route.patch(
+  '/',
+  isAuth,
+  attachUser,
   celebrate({
     body: Joi.object({
-      firstName: Joi.string().min(1).required(),
-      lastName: Joi.string().min(1).required(),
-      birthDate: Joi.date().max('now').required(),
-      email: Joi.string().email().required(),
-      password: Joi.string().min(7).required(),
-      pseudo: Joi.string().min(7).required(),
-      newsletter: Joi.boolean().required(),
+      firstName: Joi.string().min(1),
+      lastName: Joi.string().min(1),
+      birthDate: Joi.date().max('now'),
+      email: Joi.string().email(),
+      pseudo: Joi.string().min(7),
+      newsletter: Joi.boolean(),
     }),
   }),
-  async (req, res, next) => {
-    req.body.isActive = true;
-    req.body.role = Role.CLIENT;
+  async (req: userRequest, res, next) => {
+    req.currentUser.firstName = req.body.firstName || req.currentUser.firstName;
+    req.currentUser.lastName = req.body.lastName || req.currentUser.lastName;
+    req.currentUser.birthDate = req.body.birthDate || req.currentUser.birthDate;
+    req.currentUser.email = req.body.email || req.currentUser.email;
+    req.currentUser.pseudo = req.body.pseudo || req.currentUser.pseudo;
+    req.currentUser.newsletter =
+      req.body.newsletter || req.currentUser.newsletter;
     const service = Container.get(defaultService);
     try {
-      const entityResult = await service.create(req.body);
+      const entityResult = await service.update(
+        req.currentUser.id,
+        req.currentUser
+      );
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
@@ -157,6 +171,28 @@ route.post(
   }
 );
 
-route.patch;
+route.patch(
+  '/password',
+  isAuth,
+  attachUser,
+  celebrate({
+    body: Joi.object({
+      password: Joi.string().min(7).required(),
+    }),
+  }),
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      req.currentUser.password = await bcrypt.hash(req.body.password, 12);
+      const entityResult = await service.update(
+        req.currentUser.id,
+        req.currentUser
+      );
+      return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
 
 export default route;
