@@ -6,7 +6,11 @@ import Logger from '../logger';
 import config from '../config';
 import { ValidationError } from 'class-validator';
 import { isCelebrateError } from 'celebrate';
-import { ErrorHandler, handleError } from '../helpers/ErrorHandler';
+import {
+  ErrorHandler,
+  getMessageFromCelebrateError,
+  handleError,
+} from '../helpers/ErrorHandler';
 
 export default (app: Application): void => {
   // Health Check endpoints
@@ -34,7 +38,10 @@ export default (app: Application): void => {
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (isCelebrateError(err)) {
       Logger.error('Error: %o', err);
-      res.status(400).json({ error: 'Invalid data' }).end();
+      res
+        .status(400)
+        .json({ error: getMessageFromCelebrateError(err) })
+        .end();
     } else if (err instanceof Array && err[0] instanceof ValidationError) {
       const messageArr: Array<string> = [];
       let e: ValidationError;
