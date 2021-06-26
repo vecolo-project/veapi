@@ -143,12 +143,10 @@ route.put(
   }
 );
 
-//TODO group by X
 route.get(
-  '/' + 'period/',
-  isAuth,
-  checkRole(Role.STAFF),
+  '/:id/period/',
   celebrate({
+    params: Joi.object({ id: Joi.number().required() }),
     body: Joi.object({
       dateStart: Joi.date().required(),
       dateEnd: Joi.date().required(),
@@ -157,10 +155,15 @@ route.get(
   async (req, res, next) => {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
+    const dateStart: Date = new Date(req.query.dateStart.toString());
+    const dateEnd: Date = new Date(req.query.dateEnd.toString());
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling POST /station-monitoring/:id/period endpoint');
     try {
       const entityResult = await service.getMonitoringFromPeriod(
-        req.body.dateStart,
-        req.body.dateEnd
+        id,
+        dateStart,
+        dateEnd
       );
       return res.status(200).json(entityResult);
     } catch (e) {
