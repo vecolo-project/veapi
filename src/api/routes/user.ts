@@ -17,7 +17,7 @@ const paramsRules = celebrate({
     isActive: Joi.boolean().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(7).required(),
-    pseudo: Joi.string().min(7).required(),
+    pseudo: Joi.string().min(4).required(),
     newsletter: Joi.boolean().required(),
     role: Joi.string().allow('ADMIN', 'CLIENT', 'STAFF', 'STATION').required(),
   }),

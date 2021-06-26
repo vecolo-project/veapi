@@ -9,7 +9,7 @@ import BikeManufacturerService from '../services/BikeManufacturerService';
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    name: Joi.string().min(10).max(64).required(),
+    name: Joi.string().min(2).max(64).required(),
     phone: Joi.string().min(10).max(16).required(),
     address: Joi.string().required(),
   }),
