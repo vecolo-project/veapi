@@ -64,8 +64,8 @@ route.post(
 route.get('/', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
-    const offset = req.body.offset || 0;
-    const limit = req.body.limit || 20;
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
     const result = await service.findAll({ offset, limit });
     return res.status(200).json(result);
   } catch (e) {

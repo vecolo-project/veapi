@@ -38,8 +38,8 @@ route.post(
 route.get('/', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
-    const offset = req.body.offset || 0;
-    const limit = req.body.limit || 20;
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
     let articles: Article[];
     if (typeof req.body.tags !== 'undefined') {
       const tags = escape(req.body.tags);

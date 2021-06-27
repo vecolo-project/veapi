@@ -9,7 +9,7 @@ import BikeManufacturerService from '../services/BikeManufacturerService';
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    name: Joi.string().min(10).max(64).required(),
+    name: Joi.string().min(2).max(64).required(),
     phone: Joi.string().min(10).max(16).required(),
     address: Joi.string().required(),
   }),
@@ -35,8 +35,8 @@ route.post(
 route.get('/', isAuth, async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
-    const offset = req.body.offset || 0;
-    const limit = req.body.limit || 20;
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
     const entityResult = await service.find({ offset, limit });
     return res.status(200).json(entityResult);
   } catch (e) {
