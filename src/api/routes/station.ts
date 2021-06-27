@@ -61,13 +61,17 @@ route.post(
   }
 );
 
-route.get('/', async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.ADMIN), async (req, res, next) => {
+  const logger: Logger = Container.get('logger');
+  logger.debug('Calling GET /station endpoint');
+
   try {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const result = await service.findAll({ offset, limit });
-    return res.status(200).json(result);
+    const stations = await service.findAll({ offset, limit });
+    const count = await service.getRepo().count();
+    return res.status(200).json({ stations, count });
   } catch (e) {
     return next(e);
   }
