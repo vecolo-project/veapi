@@ -61,7 +61,7 @@ route.post(
   }
 );
 
-route.get('/', isAuth, checkRole(Role.ADMIN), async (req, res, next) => {
+route.get('/', async (req, res, next) => {
   const logger: Logger = Container.get('logger');
   logger.debug('Calling GET /station endpoint');
 
