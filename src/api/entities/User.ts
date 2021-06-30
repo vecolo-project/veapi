@@ -1,13 +1,13 @@
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
   BaseEntity,
-  EntityRepository,
-  Repository,
+  Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  EntityRepository,
   OneToMany,
+  PrimaryGeneratedColumn,
+  Repository,
+  UpdateDateColumn,
 } from 'typeorm';
 import { IsEmail } from 'class-validator';
 import { Service } from 'typedi';

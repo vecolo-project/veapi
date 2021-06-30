@@ -1,5 +1,4 @@
 import { Inject, Service } from 'typedi';
-import { BikeModel } from '../entities/BikeModel';
 import CRUD from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';

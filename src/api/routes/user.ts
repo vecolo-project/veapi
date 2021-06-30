@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { Logger } from 'winston';
 import { Container } from 'typedi';
-import { isAuth, attachUser, checkRole } from '../middlewares';
+import { attachUser, checkRole, isAuth } from '../middlewares';
 import UserService from '../services/UserService';
 import { userRequest } from '../../types/userRequest';
 import { Role } from '../entities/User';

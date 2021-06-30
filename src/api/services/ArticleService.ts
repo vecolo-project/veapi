@@ -24,6 +24,8 @@ export default class ArticleService extends CRUD<Article> {
       where: {
         title: Like(tags),
       },
+      take: param.limit,
+      skip: param.offset,
     });
   }
 }

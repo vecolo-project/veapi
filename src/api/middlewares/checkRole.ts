@@ -1,7 +1,7 @@
 import { Container } from 'typedi';
 import { Logger } from 'winston';
-import { Response, NextFunction, RequestHandler } from 'express';
-import { User, Role } from '../entities/User';
+import { NextFunction, RequestHandler, Response } from 'express';
+import { Role, User } from '../entities/User';
 import UserService from '../services/UserService';
 import { userRequest } from '../../types/userRequest';
 
