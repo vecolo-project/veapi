@@ -1,3 +1,4 @@
+import { CelebrateError } from 'celebrate';
 import { Response } from 'express';
 
 export class ErrorHandler extends Error {
@@ -14,4 +15,8 @@ export const handleError = (err: ErrorHandler, res: Response) => {
   res.status(statusCode).json({
     error: message,
   });
+};
+
+export const getMessageFromCelebrateError = (err: CelebrateError): string => {
+  return err.details.get('body').details[0].message;
 };

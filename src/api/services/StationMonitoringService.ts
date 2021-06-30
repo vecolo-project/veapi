@@ -8,9 +8,7 @@ import {
   StationMonitoringRepository,
   StationMonitoringStatus,
 } from '../entities/StationMonitoring';
-import { Station } from '../entities/Station';
-import { throws } from 'assert';
-import { ErrorHandler } from '../../helpers/ErrorHandler';
+import { Between } from 'typeorm';
 
 @Service()
 export default class StationMonitoringService extends CRUD<StationMonitoring> {
@@ -57,5 +55,28 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
         ...stationMonitoringProps,
       })
     );
+  }
+
+  async findLast(stationId: number): Promise<StationMonitoring | undefined> {
+    return this.stationMonitoringRepo.findOne({
+      where: { station: { id: stationId } },
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getMonitoringFromPeriod(
+    stationId: number,
+    dateStart: Date,
+    dateEnd: Date
+  ): Promise<StationMonitoring[]> {
+    return this.repo.find({
+      where: {
+        createdAt: Between(dateStart, dateEnd),
+        station: { id: stationId },
+      },
+      order: {
+        createdAt: 'ASC',
+      },
+    });
   }
 }

@@ -56,8 +56,11 @@ export default class CRUD<Entity> {
     return await this.repo.save(entity);
   }
 
-  async find(): Promise<Entity[]> {
-    const entities = await this.repo.find();
+  async find(param: getAllParams): Promise<Entity[]> {
+    const entities = await this.repo.find({
+      take: param.limit,
+      skip: param.offset,
+    });
     if (entities) {
       return entities;
     }
@@ -92,7 +95,12 @@ export default class CRUD<Entity> {
     return await this.repo.save(entity);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.repo.delete(id);
   }
+}
+
+export interface getAllParams {
+  offset?: number;
+  limit?: number;
 }
