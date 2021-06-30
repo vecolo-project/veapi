@@ -91,7 +91,7 @@ route.get('/' + ':id', async (req, res, next) => {
 route.delete(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
@@ -107,7 +107,7 @@ route.delete(
           .json({ message: 'Impossible de supprimer cette station' });
         return;
       }
-      const rideService = Container.get(RideService);
+      /*      const rideService = Container.get(RideService);
       const rides = await rideService.getAllRideFromStation(id, {
         limit: 1,
         offset: 0,
@@ -117,10 +117,11 @@ route.delete(
           .status(403)
           .json({ message: 'Impossible de supprimer cette station' });
         return;
-      }
+      }*/
+      //TODO remplacer par setNull
 
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
@@ -130,7 +131,7 @@ route.delete(
 route.put(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);
