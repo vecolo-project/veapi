@@ -6,6 +6,7 @@ import { Container } from 'typedi';
 import BikeService from '../services/BikeService';
 import RideService from '../services/RideService';
 import BikeMaintenanceThreadService from '../services/BikeMaintenanceThreadService';
+import { Bike } from '../entities/Bike';
 
 const route = Router();
 const paramsRules = celebrate({
@@ -56,6 +57,22 @@ route.get('/' + ':id', async (req, res, next) => {
     const id = Number.parseInt(req.params.id);
     const entityResult = await service.findOne(id);
     return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
+route.get('/station/' + ':id', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const id = Number.parseInt(req.params.id);
+    const bikes: Bike[] = await service.getAllFromStation(id, {
+      limit,
+      offset,
+    });
+    const count = await service.getRepo().count({ where: { station: { id } } });
+    return res.status(200).json({ bikes, count });
   } catch (e) {
     return next(e);
   }
