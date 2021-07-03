@@ -1,5 +1,5 @@
-import { Repository } from 'typeorm';
-import { Factory } from '../../types';
+import {Repository} from 'typeorm';
+import {Factory} from '../../types';
 
 export default class EntitySeed<Entity> {
   private repo: Repository<Entity>;

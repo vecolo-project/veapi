@@ -1,13 +1,13 @@
 import { Service } from 'typedi';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   EntityRepository,
-  Repository,
   OneToMany,
+  PrimaryGeneratedColumn,
+  Repository,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Subscription } from './Subscription';
 

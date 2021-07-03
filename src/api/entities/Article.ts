@@ -1,14 +1,14 @@
 import { Service } from 'typedi';
 import {
   BaseEntity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  EntityRepository,
-  Repository,
   Entity,
+  EntityRepository,
   ManyToOne,
+  PrimaryGeneratedColumn,
+  Repository,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './User';
 

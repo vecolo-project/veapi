@@ -1,6 +1,6 @@
 import cors from 'cors';
 import helmet from 'helmet';
-import { Application, NextFunction, Request, Response, json } from 'express';
+import { Application, json, NextFunction, Request, Response } from 'express';
 import apiRoutes from '../api/routes';
 import Logger from '../logger';
 import config from '../config';

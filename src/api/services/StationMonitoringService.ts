@@ -1,14 +1,14 @@
 import CRUD from './CRUD';
-import {Inject, Service} from 'typedi';
-import {InjectRepository} from 'typeorm-typedi-extensions';
-import {Logger} from 'winston';
+import { Inject, Service } from 'typedi';
+import { InjectRepository } from 'typeorm-typedi-extensions';
+import { Logger } from 'winston';
 import {
   StationMonitoring,
   StationMonitoringCreationProps,
   StationMonitoringRepository,
   StationMonitoringStatus,
 } from '../entities/StationMonitoring';
-import {Between} from 'typeorm';
+import { Between } from 'typeorm';
 
 @Service()
 export default class StationMonitoringService extends CRUD<StationMonitoring> {
@@ -65,15 +65,17 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
   }
 
   async getMonitoringFromPeriod(
+    stationId: number,
     dateStart: Date,
     dateEnd: Date
   ): Promise<StationMonitoring[]> {
     return this.repo.find({
       where: {
         createdAt: Between(dateStart, dateEnd),
+        station: { id: stationId },
       },
       order: {
-        createdAt: 'DESC',
+        createdAt: 'ASC',
       },
     });
   }

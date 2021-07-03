@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { celebrate, Joi } from 'celebrate';
-import { attachUser, checkRole, isAuth } from '../middlewares';
+import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
 import StationMaintenanceThreadService from '../services/StationMaintenanceThreadService';

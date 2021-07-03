@@ -8,6 +8,7 @@ import { MoreThan } from 'typeorm';
 @Service()
 export default class BikeService extends CRUD<Bike> {
   batteryPercentCapToBeReady = 30;
+
   constructor(
     @InjectRepository(Bike)
     protected bikeRepo: BikeRepository,
@@ -18,14 +19,14 @@ export default class BikeService extends CRUD<Bike> {
   }
 
   async getAllByModel(id: number): Promise<Bike[] | null> {
-    return this.bikeRepo.find({ where: { BikeModel: id } });
+    return this.bikeRepo.find({ where: { BikeModel: { id } } });
   }
 
   async getBikeReadyFromStation(id: number): Promise<Bike | null> {
     return this.bikeRepo.findOne({
       where: {
         status: BikeStatus.RECHARGING,
-        station: id,
+        station: { id },
         batteryPercent: MoreThan(this.batteryPercentCapToBeReady),
       },
     });
@@ -33,7 +34,7 @@ export default class BikeService extends CRUD<Bike> {
 
   async getAllFromStation(id: number, param: getAllParams): Promise<Bike[]> {
     return this.repo.find({
-      where: { station: id },
+      where: { station: { id } },
       skip: param.offset,
       take: param.limit,
     });

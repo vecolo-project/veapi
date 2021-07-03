@@ -6,13 +6,13 @@ import { Role } from '../entities/User';
 import StationService from '../services/StationService';
 import { Station } from '../entities/Station';
 import { celebrate, Joi } from 'celebrate';
-import RideService from '../services/RideService';
 import BikeService from '../services/BikeService';
 
 const route = Router();
 
 const paramsRules = celebrate({
   body: Joi.object({
+    id: Joi.number().optional(),
     batteryCapacity: Joi.number().min(0).required(),
     bikeCapacity: Joi.number().min(0).required(),
     streetNumber: Joi.number().min(0).required(),
@@ -62,12 +62,16 @@ route.post(
 );
 
 route.get('/', async (req, res, next) => {
+  const logger: Logger = Container.get('logger');
+  logger.debug('Calling GET /station endpoint');
+
   try {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const result = await service.findAll({ offset, limit });
-    return res.status(200).json(result);
+    const stations = await service.findAll({ offset, limit });
+    const count = await service.getRepo().count();
+    return res.status(200).json({ stations, count });
   } catch (e) {
     return next(e);
   }
@@ -77,7 +81,7 @@ route.get('/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
+    const entityResult = await service.getOne(id);
     return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);
@@ -87,7 +91,7 @@ route.get('/' + ':id', async (req, res, next) => {
 route.delete(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
@@ -103,20 +107,21 @@ route.delete(
           .json({ message: 'Impossible de supprimer cette station' });
         return;
       }
-      const rideService = Container.get(RideService);
-      const rides = await rideService.getAllRideFromStation(id, {
-        limit: 1,
-        offset: 0,
-      });
-      if (rides.length > 0) {
-        res
-          .status(403)
-          .json({ message: 'Impossible de supprimer cette station' });
-        return;
-      }
+      /*      const rideService = Container.get(RideService);
+          const rides = await rideService.getAllRideFromStation(id, {
+            limit: 1,
+            offset: 0,
+          });
+          if (rides.length > 0) {
+            res
+              .status(403)
+              .json({ message: 'Impossible de supprimer cette station' });
+            return;
+          }*/
+      //TODO remplacer par setNull
 
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
@@ -126,7 +131,7 @@ route.delete(
 route.put(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);

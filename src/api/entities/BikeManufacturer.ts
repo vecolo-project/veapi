@@ -1,11 +1,11 @@
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
   BaseEntity,
+  Column,
+  Entity,
   EntityRepository,
-  Repository,
   OneToMany,
+  PrimaryGeneratedColumn,
+  Repository,
 } from 'typeorm';
 import { Service } from 'typedi';
 import { BikeModel } from './BikeModel';
