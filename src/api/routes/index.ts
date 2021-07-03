@@ -14,6 +14,7 @@ import ride from './ride';
 import stationMaintenance from './stationMaintenanceThread';
 import subscription from './subscription';
 import bikeManufacturer from './bikeManufacturer';
+import bikeModel from './bikeModel';
 
 const routes = Router();
 
@@ -27,6 +28,7 @@ routes.use('/station-monitoring', stationMonitoring);
 routes.use('/article', article);
 routes.use('/bike', bike);
 routes.use('/bike-manufacturer', bikeManufacturer);
+routes.use('/bike-model', bikeModel);
 routes.use('bikeMaintenance', bikeMaintenance);
 routes.use('invoice', invoice);
 routes.use('issue', issue);
