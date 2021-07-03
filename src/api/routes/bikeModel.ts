@@ -16,8 +16,6 @@ const paramsRules = celebrate({
     maxSpeed: Joi.number().min(0).required(),
     maxDistance: Joi.number().min(0).required(),
     description: Joi.string().required(),
-    image: Joi.string().required(),
-    icon: Joi.string().required(),
     bikeManufacturer: Joi.number().min(0).required(),
   }),
 });
@@ -95,6 +93,24 @@ route.put(
     try {
       const entityResult = await service.update(id, req.body);
       return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.post(
+  '/add-image',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    if (!req.files) {
+      res.status(400).send('No files provided');
+    }
+    try {
+      const file = req.files[0];
+      service.handleImageUpload(file);
     } catch (e) {
       return next(e);
     }
