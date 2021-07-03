@@ -4,7 +4,7 @@ import CRUD from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { UploadedFile } from 'express-fileupload';
-import { generatePrefix } from 'src/helpers/FileHelper';
+import { generatePrefix } from '../../helpers/FileHelper';
 import UPLOAD_PATH from '../../config/uploadPath';
 
 @Service()

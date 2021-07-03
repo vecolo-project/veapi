@@ -3,6 +3,7 @@ import { celebrate, Joi } from 'celebrate';
 import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
+import { UploadedFile } from 'express-fileupload';
 import BikeModelService from '../services/BikeModelService';
 import BikeService from '../services/BikeService';
 
@@ -105,11 +106,12 @@ route.post(
   checkRole(Role.STAFF),
   async (req, res, next) => {
     const service = Container.get(defaultService);
+    console.log(req.files);
     if (!req.files) {
-      res.status(400).send('No files provided');
+      return res.status(400).send('No files provided');
     }
     try {
-      const file = req.files[0];
+      const file = req.files[0] as UploadedFile;
       service.handleImageUpload(file);
     } catch (e) {
       return next(e);
