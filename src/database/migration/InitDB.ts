@@ -86,7 +86,7 @@ export class InitDB1621280558787 implements MigrationInterface {
       'ALTER TABLE `station_maintenance_thread` ADD CONSTRAINT `FK_48161fff9f96d02d2fb5dcabb20` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION'
     );
     await queryRunner.query(
-      'ALTER TABLE `bike_model` ADD CONSTRAINT `FK_58890ebe484c5170e8cbfec4632` FOREIGN KEY (`biekManufacturerId`) REFERENCES `bike_manufacturer`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION'
+      'ALTER TABLE `bike_model` ADD CONSTRAINT `FK_58890ebe484c5170e8cbfec4632` FOREIGN KEY (bikeManufacturerId) REFERENCES `bike_manufacturer`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION'
     );
     await queryRunner.query(
       'ALTER TABLE `bike_maintenance_thread` ADD CONSTRAINT `FK_1ae68bf7d756b2d1170a774873a` FOREIGN KEY (`bikeBreakdownId`) REFERENCES `bike`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION'
