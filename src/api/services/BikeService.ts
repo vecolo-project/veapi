@@ -35,6 +35,7 @@ export default class BikeService extends CRUD<Bike> {
   async getAllFromStation(id: number, param: getAllParams): Promise<Bike[]> {
     return this.repo.find({
       where: { station: { id } },
+      relations: ['model', 'model.bikeManufacturer'],
       skip: param.offset,
       take: param.limit,
     });

@@ -34,7 +34,7 @@ routes.use('invoice', invoice);
 routes.use('issue', issue);
 routes.use('issueThread', issueThread);
 routes.use('plan', plan);
-routes.use('ride', ride);
+routes.use('/ride', ride);
 routes.use('stationMaintenance', stationMaintenance);
 routes.use('subscription', subscription);
 
