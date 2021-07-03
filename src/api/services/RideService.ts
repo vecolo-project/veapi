@@ -39,9 +39,10 @@ export default class RideService extends CRUD<Ride> {
     param: getAllParams
   ): Promise<Ride[] | null> {
     return this.rideRepo.find({
-      where: [{ startStation: id }, { endStation: id }],
+      where: [{ startStation: { id } }, { endStation: { id } }],
       skip: param.offset,
       take: param.limit,
+      relations: ['user', 'bike', 'startStation', 'endStation'],
     });
   }
 }

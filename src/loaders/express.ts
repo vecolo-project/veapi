@@ -5,6 +5,7 @@ import apiRoutes from '../api/routes';
 import Logger from '../logger';
 import config from '../config';
 import { ValidationError } from 'class-validator';
+import fileUpload from 'express-fileupload';
 import { isCelebrateError } from 'celebrate';
 import {
   ErrorHandler,
@@ -30,6 +31,9 @@ export default (app: Application): void => {
 
   // Middleware that transforms the raw string of req.body into json
   app.use(json());
+
+  // Middleware for fileUpload
+  app.use(fileUpload());
 
   // Load API routes
   app.use(`/${config.endpointPrefix}`, apiRoutes);

@@ -3,6 +3,7 @@ import { celebrate, Joi } from 'celebrate';
 import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
+import { UploadedFile } from 'express-fileupload';
 import BikeModelService from '../services/BikeModelService';
 import BikeService from '../services/BikeService';
 
@@ -16,8 +17,6 @@ const paramsRules = celebrate({
     maxSpeed: Joi.number().min(0).required(),
     maxDistance: Joi.number().min(0).required(),
     description: Joi.string().required(),
-    image: Joi.string().required(),
-    icon: Joi.string().required(),
     bikeManufacturer: Joi.number().min(0).required(),
   }),
 });
@@ -95,6 +94,25 @@ route.put(
     try {
       const entityResult = await service.update(id, req.body);
       return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.post(
+  '/add-image',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    console.log(req.files);
+    if (!req.files) {
+      return res.status(400).send('No files provided');
+    }
+    try {
+      const file = req.files[0] as UploadedFile;
+      service.handleImageUpload(file);
     } catch (e) {
       return next(e);
     }

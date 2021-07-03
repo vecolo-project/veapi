@@ -57,6 +57,31 @@ route.get(
   }
 );
 
+route.get(
+  '/station/' + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const offset = Number(req.query.offset) || 0;
+      const limit = Number(req.query.limit) || 20;
+
+      const id = Number.parseInt(req.params.id);
+      const rides = await service.getAllRideFromStation(id, {
+        limit,
+        offset,
+      });
+      const count = await service
+        .getRepo()
+        .count({ where: [{ startStation: { id } }, { endStation: { id } }] });
+      return res.status(200).json({ rides, count });
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
 route.delete(
   '/' + ':id',
   isAuth,
