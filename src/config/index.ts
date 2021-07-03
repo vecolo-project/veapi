@@ -20,7 +20,7 @@ let config: Config;
 
 if (process.env.NODE_ENV === 'development') {
   config = {
-    port: 4562,
+    port: 3000,
     jwtSecret: 'vécolo JWT secret',
     dbUser: 'root',
     dbPassword: 'root',
@@ -31,11 +31,11 @@ if (process.env.NODE_ENV === 'development') {
     logs: {
       level: 'debug',
     },
-    endpointPrefix: 'api',
+    endpointPrefix: '',
   };
 } else if (process.env.NODE_ENV === 'test') {
   config = {
-    port: 4562,
+    port: 3000,
     jwtSecret: 'vécolo JWT secret',
     dbUser: 'root',
     dbPassword: 'root',
@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'development') {
     logs: {
       level: 'debug',
     },
-    endpointPrefix: 'api',
+    endpointPrefix: '',
   };
 } else {
   config = {
