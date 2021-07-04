@@ -40,10 +40,10 @@ export class BikeModel extends BaseEntity {
   @Column({ type: 'text' })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
 
-  @Column()
+  @Column({ nullable: true })
   icon: string;
 
   @OneToMany(() => Bike, (bike) => bike.station)

@@ -43,7 +43,11 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const entityResult = await service.find({ offset, limit });
+    const entityResult = await service.find({
+      offset,
+      limit,
+      relations: ['bikeManufacturer'],
+    });
     return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);
