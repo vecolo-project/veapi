@@ -22,9 +22,11 @@ export default class BikeModelService extends CRUD<BikeModel> {
     return this.bikeModelRepo.find({ where: { bikeManufacturer: id } });
   }
 
-  handleImageUpload(file: UploadedFile) {
+  handleImageUpload(file: UploadedFile, id: number): string {
     const prefix = generatePrefix();
     const filename = prefix + file.name;
     file.mv(UPLOAD_PATH.bikeModelImage + filename);
+    this.bikeModelRepo.update(id, { image: filename });
+    return filename;
   }
 }

@@ -47,3 +47,6 @@ database/
 
 #Localshit
 .idea
+
+# Upload
+/uploads/bike-model/*

@@ -101,18 +101,22 @@ route.put(
 );
 
 route.post(
-  '/add-image',
+  '/add-image/:bikeModelId',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
     const service = Container.get(defaultService);
-    console.log(req.files);
+    const id = Number.parseInt(req.query.bikeModelId as string);
+    if (!id) {
+      return res.status(400).send('No model target provided');
+    }
     if (!req.files) {
       return res.status(400).send('No files provided');
     }
     try {
-      const file = req.files[0] as UploadedFile;
-      service.handleImageUpload(file);
+      const file = req.files.bikeModelImage as UploadedFile;
+      const fileName = service.handleImageUpload(file, id);
+      res.status(201).json({ url: fileName });
     } catch (e) {
       return next(e);
     }
