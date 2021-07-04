@@ -83,7 +83,7 @@ route.delete(
         return;
       }
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
