@@ -75,10 +75,11 @@ route.delete(
       const serviceBike = Container.get(BikeService);
       const id = Number.parseInt(req.params.id);
       const dependency = await serviceBike.getAllByModel(id);
-      if (dependency.length != 0)
+      if (dependency.length != 0) {
         return res
           .status(403)
           .json({ message: 'Impossible de supprimer ce model' });
+      }
       await service.delete(id);
       return res.status(204).json();
     } catch (e) {
