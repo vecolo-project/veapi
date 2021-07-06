@@ -25,8 +25,11 @@ export class Plan {
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   costPerMinute: number;
 
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
+  freeMinutes: number;
+
   @Column({ nullable: false, default: false })
-  isUnlimited: boolean;
+  isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
