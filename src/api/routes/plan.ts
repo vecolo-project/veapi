@@ -35,13 +35,27 @@ route.post(
   }
 );
 
-route.get('/', async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
     const plans = await service.find({ offset, limit });
     const count = await service.getRepo().count();
+    return res.status(200).json({ plans, count });
+  } catch (e) {
+    return next(e);
+  }
+});
+route.get('/active', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const plans = await service
+      .getRepo()
+      .find({ skip: offset, take: limit, where: { isActive: true } });
+    const count = await service.getRepo().count({ where: { isActive: true } });
     return res.status(200).json({ plans, count });
   } catch (e) {
     return next(e);
