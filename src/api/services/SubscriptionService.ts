@@ -3,10 +3,9 @@ import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { Subscription, SubscriptionRepository } from '../entities/Subscription';
-import { ObjectLiteral } from 'typeorm';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { validate } from 'class-validator';
-import _ from "lodash";
+import _ from 'lodash';
 
 @Service()
 export default class SubscriptionService extends CRUD<Subscription> {
