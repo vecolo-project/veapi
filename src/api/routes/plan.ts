@@ -9,10 +9,12 @@ import SubscriptionService from '../services/SubscriptionService';
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    name: Joi.string().max(32).min(10).required(),
+    id: Joi.number().optional(),
+    name: Joi.string().max(30).min(3).required(),
     price: Joi.number().required(),
     costPerMinute: Joi.number().required(),
-    isUnlimited: Joi.boolean().required(),
+    freeMinutes: Joi.number().required(),
+    isActive: Joi.boolean().required(),
   }),
 });
 const defaultService = PlanService;
@@ -33,13 +35,28 @@ route.post(
   }
 );
 
-route.get('/', async (req, res, next) => {
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const result = await service.find({ offset, limit });
-    return res.status(200).json(result);
+    const plans = await service.find({ offset, limit });
+    const count = await service.getRepo().count();
+    return res.status(200).json({ plans, count });
+  } catch (e) {
+    return next(e);
+  }
+});
+route.get('/active', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const plans = await service
+      .getRepo()
+      .find({ skip: offset, take: limit, where: { isActive: true } });
+    const count = await service.getRepo().count({ where: { isActive: true } });
+    return res.status(200).json({ plans, count });
   } catch (e) {
     return next(e);
   }
@@ -76,7 +93,7 @@ route.delete(
         return;
       }
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
@@ -86,7 +103,7 @@ route.delete(
 route.put(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   paramsRules,
   async (req, res, next) => {
     const service = Container.get(defaultService);

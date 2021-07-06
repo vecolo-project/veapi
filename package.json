@@ -15,8 +15,12 @@
     "semantic-release": "semantic-release",
     "generate-migration": "npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
     "generate-migration:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
+    "generate-migration:win": "npx ts-node -r . node_modules\\typeorm\\cli.js migration:generate -n newMigration",
+    "generate-migration:win-prod": "cross-env NODE_ENV=production npx ts-node -r . node_modules\\typeorm\\cli.js migration:generate -n newMigration",
     "migrate": "npx ts-node node_modules/.bin/typeorm migration:run",
-    "migrate:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:run"
+    "migrate:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:run",
+    "migrate:win": "npx ts-node -r . node_modules\\typeorm\\cli.js migration:run",
+    "migrate:win-prod": "cross-env NODE_ENV=production npx ts-node -r . node_modules\\typeorm\\cli.js migration:run"
   },
   "repository": {
     "type": "git",

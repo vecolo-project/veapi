@@ -10,11 +10,12 @@ import InvoiceService from '../services/InvoiceService';
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
+    id: Joi.number().optional(),
     startDate: Joi.date().required(),
     monthDuration: Joi.number().min(1).required(),
     autoRenew: Joi.boolean().required(),
-    plan: Joi.number().min(0).required(),
-    user: Joi.number().min(0).required(),
+    plan: Joi.object().min(0).required(),
+    user: Joi.object().min(0).required(),
   }),
 });
 const defaultService = SubscriptionService;
@@ -40,8 +41,9 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const result = await service.find({ offset, limit });
-    return res.status(200).json(result);
+    const subscriptions = await service.getAllWithRelation({ offset, limit });
+    const count = await service.getRepo().count();
+    return res.status(200).json({ subscriptions, count });
   } catch (e) {
     return next(e);
   }
@@ -55,7 +57,7 @@ route.get(
     try {
       const service = Container.get(defaultService);
       const id = Number.parseInt(req.params.id);
-      const entityResult = await service.findOne(id);
+      const entityResult = await service.getOneWithRelation(id);
       return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
@@ -83,7 +85,7 @@ route.delete(
         return;
       }
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
