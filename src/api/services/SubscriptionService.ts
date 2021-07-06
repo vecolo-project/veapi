@@ -27,4 +27,15 @@ export default class SubscriptionService extends CRUD<Subscription> {
       take: params.limit,
     });
   }
+  async getAllWithRelation(params: getAllParams): Promise<Subscription[]> {
+    const result = await this.repo.find({
+      relations: ['plan', 'user'],
+      skip: params.offset,
+      take: params.limit,
+    });
+    for (const sub of result) {
+      Reflect.deleteProperty(sub.user, 'password');
+    }
+    return result;
+  }
 }

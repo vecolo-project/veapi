@@ -36,6 +36,6 @@ routes.use('issueThread', issueThread);
 routes.use('/plan', plan);
 routes.use('/ride', ride);
 routes.use('stationMaintenance', stationMaintenance);
-routes.use('subscription', subscription);
+routes.use('/subscription', subscription);
 
 export default routes;
