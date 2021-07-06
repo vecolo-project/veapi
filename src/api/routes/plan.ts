@@ -13,7 +13,8 @@ const paramsRules = celebrate({
     name: Joi.string().max(30).min(3).required(),
     price: Joi.number().required(),
     costPerMinute: Joi.number().required(),
-    isUnlimited: Joi.boolean().required(),
+    freeMinutes: Joi.number().required(),
+    isActive: Joi.boolean().required(),
   }),
 });
 const defaultService = PlanService;
