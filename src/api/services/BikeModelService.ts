@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import { UploadedFile } from 'express-fileupload';
 import { generatePrefix } from '../../helpers/FileHelper';
 import UPLOAD_PATH from '../../config/uploadPath';
-import { ErrorHandler } from 'src/helpers/ErrorHandler';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 @Service()
 export default class BikeModelService extends CRUD<BikeModel> {
