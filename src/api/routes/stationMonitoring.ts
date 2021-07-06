@@ -160,11 +160,18 @@ route.get(
     const logger: Logger = Container.get('logger');
     logger.debug('Calling POST /station-monitoring/:id/period endpoint');
     try {
-      const entityResult = await service.getMonitoringFromPeriod(
+      let entityResult = await service.getMonitoringFromPeriod(
         id,
         dateStart,
         dateEnd
       );
+
+      if (entityResult.length > 500) {
+        const moduloFilter = Math.round(entityResult.length / 500);
+        entityResult = entityResult.filter(
+          (value, index) => index % moduloFilter === 0
+        );
+      }
       return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
