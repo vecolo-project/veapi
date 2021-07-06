@@ -23,8 +23,6 @@ routes.get('/', (req, res) => {
 });
 routes.use('/auth', auth);
 routes.use('/user', user);
-<<<<<<< Updated upstream
-=======
 routes.use('/station', station);
 routes.use('/station-monitoring', stationMonitoring);
 routes.use('/article', article);
@@ -39,6 +37,5 @@ routes.use('/plan', plan);
 routes.use('/ride', ride);
 routes.use('stationMaintenance', stationMaintenance);
 routes.use('subscription', subscription);
->>>>>>> Stashed changes
 
 export default routes;
