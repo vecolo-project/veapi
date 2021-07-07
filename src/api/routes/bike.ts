@@ -11,7 +11,8 @@ import { Bike } from '../entities/Bike';
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    matriculate: Joi.string().max(32).min(10).required(),
+    id: Joi.number().optional(),
+    matriculate: Joi.string().max(32).min(5).required(),
     station: Joi.number().min(0).required(),
     batteryPercent: Joi.number().min(0).max(100).required(),
     recharging: Joi.boolean().required(),

@@ -36,6 +36,7 @@ export default class BikeModelService extends CRUD<BikeModel> {
   handleImageUpload(file: UploadedFile, id: number): string {
     const prefix = generatePrefix();
     const filename = prefix + file.name;
+    console.log(filename);
     file.mv(UPLOAD_PATH.bikeModelImage + filename);
     this.bikeModelRepo.update(id, { image: filename });
     return filename;

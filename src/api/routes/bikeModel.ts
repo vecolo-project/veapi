@@ -106,12 +106,12 @@ route.put(
 );
 
 route.post(
-  '/add-image/:bikeModelId',
+  '/add-image/:modelId',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
     const service = Container.get(defaultService);
-    const id = Number.parseInt(req.query.bikeModelId as string);
+    const id = Number.parseInt(req.params.modelId as string);
     if (!id) {
       return res.status(400).send('No model target provided');
     }
