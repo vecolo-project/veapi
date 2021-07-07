@@ -13,6 +13,7 @@ import { Logger } from 'winston';
 import { validate } from 'class-validator';
 import CRUD, { getAllParams } from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
+import { Like } from 'typeorm';
 
 @Service()
 export default class UserService extends CRUD<User> {
@@ -89,15 +90,42 @@ export default class UserService extends CRUD<User> {
     );
   }
 
-  async find(params: getAllParams): Promise<User[]> {
-    const users = await this.repo.find({
-      take: params.limit,
-      skip: params.offset,
-    });
+  async search(
+    params: getAllParams,
+    searchQuery?: any
+  ): Promise<{ users: User[]; count: number }> {
+    let users: User[];
+    let count: number;
+    if (searchQuery) {
+      users = await this.repo.find({
+        where: [
+          { firstName: Like(`%${searchQuery}%`) },
+          { lastName: Like(`%${searchQuery}%`) },
+          { email: Like(`%${searchQuery}%`) },
+          { role: Like(`%${searchQuery}%`) },
+        ],
+        take: params.limit,
+        skip: params.offset,
+      });
+      count = await this.repo.count({
+        where: [
+          { firstName: Like(`%${searchQuery}%`) },
+          { lastName: Like(`%${searchQuery}%`) },
+          { email: Like(`%${searchQuery}%`) },
+          { role: Like(`%${searchQuery}%`) },
+        ],
+      });
+    } else {
+      users = await this.repo.find({
+        take: params.limit,
+        skip: params.offset,
+      });
+      count = await this.repo.count();
+    }
     for (const user of users) {
       Reflect.deleteProperty(user, 'password');
     }
-    return users;
+    return { users, count };
   }
 
   async findOne(id: number): Promise<User | undefined> {
