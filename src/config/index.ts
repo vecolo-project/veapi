@@ -18,22 +18,7 @@ export interface Config {
 }
 let config: Config;
 
-if (process.env.NODE_ENV === 'development') {
-  config = {
-    port: 3000,
-    jwtSecret: 'vécolo JWT secret',
-    dbUser: 'root',
-    dbPassword: 'root',
-    dbSchema: 'vecolo',
-    dbPort: 3306,
-    dbType: 'mariadb',
-    dbHost: 'localhost',
-    logs: {
-      level: 'debug',
-    },
-    endpointPrefix: '',
-  };
-} else if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'test') {
   config = {
     port: 3000,
     jwtSecret: 'vécolo JWT secret',
