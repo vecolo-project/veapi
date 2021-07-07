@@ -35,8 +35,11 @@ route.get(
       const userServiceInstance = Container.get(UserService);
       const offset = Number(req.query.offset) || 0;
       const limit = Number(req.query.limit) || 20;
-      const users = await userServiceInstance.find({ offset, limit });
-      const count = await userServiceInstance.getRepo().count();
+      const searchQuery = req.query.searchQuery || '';
+      const { users, count } = await userServiceInstance.search(
+        { offset, limit },
+        searchQuery
+      );
       return res.json({ users, count }).status(200);
     } catch (e) {
       return next(e);
