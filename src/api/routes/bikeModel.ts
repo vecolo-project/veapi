@@ -118,8 +118,11 @@ route.post(
     if (!req.files) {
       return res.status(400).send('No files provided');
     }
+    const file = req.files.bikeModelImage as UploadedFile;
+    if (!file) {
+      return res.status(400).send('No files provided');
+    }
     try {
-      const file = req.files.bikeModelImage as UploadedFile;
       const fileName = service.handleImageUpload(file, id);
       res.status(201).json({ url: fileName });
     } catch (e) {
