@@ -40,4 +40,11 @@ export default class BikeService extends CRUD<Bike> {
       take: param.limit,
     });
   }
+
+  async findWithStationAndModel(id: number): Promise<Bike> {
+    return this.repo.findOne({
+      where: { id },
+      relations: ['model', 'station'],
+    });
+  }
 }

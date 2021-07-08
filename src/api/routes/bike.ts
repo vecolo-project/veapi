@@ -62,6 +62,18 @@ route.get('/' + ':id', async (req, res, next) => {
     return next(e);
   }
 });
+
+route.get('/full/:id', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.findWithStationAndModel(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
+
 route.get('/station/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
