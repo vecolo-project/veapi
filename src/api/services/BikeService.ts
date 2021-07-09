@@ -19,7 +19,7 @@ export default class BikeService extends CRUD<Bike> {
   }
 
   async getAllByModel(id: number): Promise<Bike[] | null> {
-    return this.bikeRepo.find({ where: { BikeModel: { id } } });
+    return this.bikeRepo.find({ where: { model: { id } } });
   }
 
   async getBikeReadyFromStation(id: number): Promise<Bike | null> {
@@ -38,6 +38,13 @@ export default class BikeService extends CRUD<Bike> {
       relations: ['model', 'model.bikeManufacturer'],
       skip: param.offset,
       take: param.limit,
+    });
+  }
+
+  async findWithStationAndModel(id: number): Promise<Bike> {
+    return this.repo.findOne({
+      where: { id },
+      relations: ['model', 'station'],
     });
   }
 }

@@ -11,7 +11,8 @@ import { Bike } from '../entities/Bike';
 const route = Router();
 const paramsRules = celebrate({
   body: Joi.object({
-    matriculate: Joi.string().max(32).min(10).required(),
+    id: Joi.number().optional(),
+    matriculate: Joi.string().max(32).min(5).required(),
     station: Joi.number().min(0).required(),
     batteryPercent: Joi.number().min(0).max(100).required(),
     recharging: Joi.boolean().required(),
@@ -61,6 +62,18 @@ route.get('/' + ':id', async (req, res, next) => {
     return next(e);
   }
 });
+
+route.get('/full/:id', async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.findWithStationAndModel(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
+
 route.get('/station/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
@@ -97,7 +110,7 @@ route.delete(
           .status(403)
           .json({ message: 'Impossible de supprimer ce vélo' });
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }

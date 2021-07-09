@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 import { UploadedFile } from 'express-fileupload';
 import { generatePrefix } from '../../helpers/FileHelper';
 import UPLOAD_PATH from '../../config/uploadPath';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 @Service()
 export default class BikeModelService extends CRUD<BikeModel> {
@@ -22,9 +23,21 @@ export default class BikeModelService extends CRUD<BikeModel> {
     return this.bikeModelRepo.find({ where: { bikeManufacturer: id } });
   }
 
-  handleImageUpload(file: UploadedFile) {
+  async findOneWithManufacturer(id: number): Promise<BikeModel | undefined> {
+    const entity = await this.repo.findOne(id, {
+      relations: ['bikeManufacturer'],
+    });
+    if (entity) {
+      return entity;
+    }
+    throw new ErrorHandler(404, 'Not found');
+  }
+
+  handleImageUpload(file: UploadedFile, id: number): string {
     const prefix = generatePrefix();
     const filename = prefix + file.name;
     file.mv(UPLOAD_PATH.bikeModelImage + filename);
+    this.bikeModelRepo.update({ id }, { image: filename });
+    return filename;
   }
 }

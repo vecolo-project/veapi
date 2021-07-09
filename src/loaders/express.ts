@@ -1,6 +1,13 @@
 import cors from 'cors';
 import helmet from 'helmet';
-import { Application, json, NextFunction, Request, Response } from 'express';
+import {
+  Application,
+  json,
+  NextFunction,
+  Request,
+  Response,
+  static as expressStatic,
+} from 'express';
 import apiRoutes from '../api/routes';
 import Logger from '../logger';
 import config from '../config';
@@ -37,6 +44,9 @@ export default (app: Application): void => {
 
   // Load API routes
   app.use(`/${config.endpointPrefix}`, apiRoutes);
+
+  // Give access to uploaded file
+  app.use('/uploads', expressStatic('uploads'));
 
   /// Error handlers
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

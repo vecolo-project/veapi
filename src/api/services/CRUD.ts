@@ -57,10 +57,13 @@ export default class CRUD<Entity> {
   }
 
   async find(param: getAllParams): Promise<Entity[]> {
-    const entities = await this.repo.find({
-      take: param.limit,
-      skip: param.offset,
-    });
+    const option = {};
+    option['take'] = param.limit;
+    option['skip'] = param.offset;
+    if (param.relations) {
+      option['relations'] = param.relations;
+    }
+    const entities = await this.repo.find(option);
     if (entities) {
       return entities;
     }
@@ -103,4 +106,5 @@ export default class CRUD<Entity> {
 export interface getAllParams {
   offset?: number;
   limit?: number;
+  relations?: string[];
 }

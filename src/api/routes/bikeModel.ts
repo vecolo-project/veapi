@@ -43,7 +43,11 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const entityResult = await service.find({ offset, limit });
+    const entityResult = await service.find({
+      offset,
+      limit,
+      relations: ['bikeManufacturer'],
+    });
     return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);
@@ -54,7 +58,7 @@ route.get('/' + ':id', async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
+    const entityResult = await service.findOneWithManufacturer(id);
     return res.status(200).json(entityResult);
   } catch (e) {
     return next(e);
@@ -71,10 +75,11 @@ route.delete(
       const serviceBike = Container.get(BikeService);
       const id = Number.parseInt(req.params.id);
       const dependency = await serviceBike.getAllByModel(id);
-      if (dependency.length != 0)
+      if (dependency.length != 0) {
         return res
           .status(403)
           .json({ message: 'Impossible de supprimer ce model' });
+      }
       await service.delete(id);
       return res.status(204).json();
     } catch (e) {
@@ -101,18 +106,25 @@ route.put(
 );
 
 route.post(
-  '/add-image',
+  '/add-image/:modelId',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
     const service = Container.get(defaultService);
-    console.log(req.files);
+    const id = Number.parseInt(req.params.modelId as string);
+    if (!id) {
+      return res.status(400).send('No model target provided');
+    }
     if (!req.files) {
       return res.status(400).send('No files provided');
     }
+    const file = req.files.bikeModelImage as UploadedFile;
+    if (!file) {
+      return res.status(400).send('No files provided');
+    }
     try {
-      const file = req.files[0] as UploadedFile;
-      service.handleImageUpload(file);
+      const fileName = service.handleImageUpload(file, id);
+      res.status(201).json({ url: fileName });
     } catch (e) {
       return next(e);
     }
