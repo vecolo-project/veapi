@@ -110,7 +110,7 @@ route.delete(
           .status(403)
           .json({ message: 'Impossible de supprimer ce vélo' });
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
