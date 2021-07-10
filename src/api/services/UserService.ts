@@ -97,23 +97,19 @@ export default class UserService extends CRUD<User> {
     let users: User[];
     let count: number;
     if (searchQuery) {
+      const whereOption = [
+        { firstName: Like(`%${searchQuery}%`) },
+        { lastName: Like(`%${searchQuery}%`) },
+        { email: Like(`%${searchQuery}%`) },
+        { role: Like(`%${searchQuery}%`) },
+      ];
       users = await this.repo.find({
-        where: [
-          { firstName: Like(`%${searchQuery}%`) },
-          { lastName: Like(`%${searchQuery}%`) },
-          { email: Like(`%${searchQuery}%`) },
-          { role: Like(`%${searchQuery}%`) },
-        ],
+        where: whereOption,
         take: params.limit,
         skip: params.offset,
       });
       count = await this.repo.count({
-        where: [
-          { firstName: Like(`%${searchQuery}%`) },
-          { lastName: Like(`%${searchQuery}%`) },
-          { email: Like(`%${searchQuery}%`) },
-          { role: Like(`%${searchQuery}%`) },
-        ],
+        where: whereOption,
       });
     } else {
       users = await this.repo.find({
