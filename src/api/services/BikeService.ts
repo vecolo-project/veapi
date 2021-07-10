@@ -3,7 +3,7 @@ import { Bike, BikeRepository, BikeStatus } from '../entities/Bike';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
-import { MoreThan } from 'typeorm';
+import { Like, MoreThan } from 'typeorm';
 
 @Service()
 export default class BikeService extends CRUD<Bike> {
@@ -46,5 +46,48 @@ export default class BikeService extends CRUD<Bike> {
       where: { id },
       relations: ['model', 'station'],
     });
+  }
+
+  async search(
+    params: getAllParams,
+    searchQuery?: any
+  ): Promise<{ bikes: Bike[]; count: number }> {
+    let bikes: Bike[];
+    let count: number;
+    if (searchQuery) {
+      bikes = await this.repo.find({
+        where: [
+          { matriculate: Like(`%${searchQuery}%`) },
+          { batteryPercent: Like(`%${searchQuery}%`) },
+          { status: Like(`%${searchQuery}%`) },
+          {
+            model: {
+              name: Like(`%${searchQuery}%`),
+            },
+          },
+        ],
+        take: params.limit,
+        skip: params.offset,
+      });
+      count = await this.repo.count({
+        where: [
+          { matriculate: Like(`%${searchQuery}%`) },
+          { batteryPercent: Like(`%${searchQuery}%`) },
+          { status: Like(`%${searchQuery}%`) },
+          {
+            model: {
+              name: Like(`%${searchQuery}%`),
+            },
+          },
+        ],
+      });
+    } else {
+      bikes = await this.repo.find({
+        take: params.limit,
+        skip: params.offset,
+      });
+      count = await this.repo.count();
+    }
+    return { bikes, count };
   }
 }

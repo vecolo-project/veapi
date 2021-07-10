@@ -28,10 +28,10 @@ export class Bike extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   matriculate: string;
 
-  @ManyToOne(() => Station, (station) => station.id)
+  @ManyToOne(() => Station, (station) => station.id, { nullable: true })
   station: Station;
 
   @Column({ type: 'double' })

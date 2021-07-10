@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import config from '../../config';
 import StationMonitoringService from './StationMonitoringService';
 import { StationMonitoring } from '../entities/StationMonitoring';
+import { Like } from 'typeorm';
 
 @Service()
 export default class StationService extends CRUD<Station> {
@@ -41,6 +42,45 @@ export default class StationService extends CRUD<Station> {
     }
     return stations;
   }
+
+  async search(
+    params: getAllParams,
+    searchQuery?: any
+  ): Promise<{ stations: Station[]; count: number }> {
+    let stations: Station[];
+    let count: number;
+    if (searchQuery) {
+      [stations, count] = await this.repo.findAndCount({
+        where: [
+          { id: Like(`%${searchQuery}%`) },
+          { streetNumber: Like(`%${searchQuery}%`) },
+          { streetName: Like(`%${searchQuery}%`) },
+          { city: Like(`%${searchQuery}%`) },
+          { zipcode: Like(`%${searchQuery}%`) },
+        ],
+        take: params.limit,
+        skip: params.offset,
+      });
+    } else {
+      [stations, count] = await this.repo.findAndCount({
+        take: params.limit,
+        skip: params.offset,
+      });
+    }
+    for (const i in stations) {
+      const monitoring: StationMonitoring = await this.stationMonitoringService.findLast(
+        stations[i].id
+      );
+      if (monitoring) {
+        stations[i].stationMonitoring = [monitoring];
+      } else {
+        stations[i].stationMonitoring = [];
+      }
+    }
+
+    return { stations, count };
+  }
+
   async getOne(id: number): Promise<Station | undefined> {
     const station: Station = await this.findOne(id);
     if (station) {
