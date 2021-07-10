@@ -45,8 +45,13 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const entityResult = await service.find({ offset, limit });
-    return res.status(200).json(entityResult);
+    const searchQuery = req.query.searchQuery || '';
+
+    const { bikes, count } = await service.search(
+      { offset, limit },
+      searchQuery
+    );
+    return res.status(200).json({ bikes, count });
   } catch (e) {
     return next(e);
   }

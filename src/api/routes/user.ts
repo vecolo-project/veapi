@@ -96,7 +96,7 @@ route.delete(
       const id = Number.parseInt(req.params.id);
       //TODO delete dependency
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
