@@ -31,7 +31,7 @@ export class Bike extends BaseEntity {
   @Column({ unique: true })
   matriculate: string;
 
-  @ManyToOne(() => Station, (station) => station.id)
+  @ManyToOne(() => Station, (station) => station.id, { nullable: true })
   station: Station;
 
   @Column({ type: 'double' })
