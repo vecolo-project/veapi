@@ -44,7 +44,7 @@ export default class BikeService extends CRUD<Bike> {
   async findWithStationAndModel(id: number): Promise<Bike> {
     return this.repo.findOne({
       where: { id },
-      relations: ['model', 'station'],
+      relations: ['model', 'model.bikeManufacturer', 'station'],
     });
   }
 
