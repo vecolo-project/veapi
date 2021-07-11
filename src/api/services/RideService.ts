@@ -27,10 +27,17 @@ export default class RideService extends CRUD<Ride> {
     });
   }
 
-  async getAllRideFromBike(id: number): Promise<Ride[] | null> {
-    return this.rideRepo.find({
-      where: { user: id },
-      order: { createdAt: 'DESC' },
+  async getAllRideFromBike(
+    id: number,
+    param?: getAllParams
+  ): Promise<[Ride[], number]> {
+    return this.rideRepo.findAndCount({
+      where: {
+        bike: { id },
+      },
+      skip: param.offset,
+      take: param.limit,
+      relations: ['user', 'bike', 'startStation', 'endStation'],
     });
   }
 
