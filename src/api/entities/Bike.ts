@@ -40,7 +40,7 @@ export class Bike extends BaseEntity {
   @Column({ nullable: false, default: false })
   recharging: boolean;
 
-  @ManyToOne(() => BikeModel, (bikeModel) => bikeModel.id)
+  @ManyToOne(() => BikeModel, (bikeModel) => bikeModel.bikes)
   model: BikeModel;
 
   @Column({
