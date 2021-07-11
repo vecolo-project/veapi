@@ -30,6 +30,18 @@ export default class SubscriptionService extends CRUD<Subscription> {
       take: params.limit,
     });
   }
+  async getAllFromUser(
+    id: number,
+    params: getAllParams
+  ): Promise<[Subscription[], number]> {
+    return this.repo.findAndCount({
+      where: {
+        user: { id },
+      },
+      skip: params.offset,
+      take: params.limit,
+    });
+  }
 
   async getAllWithRelation(params: getAllParams): Promise<Subscription[]> {
     const result = await this.repo.find({
