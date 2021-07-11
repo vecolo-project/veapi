@@ -12,6 +12,8 @@ WORKDIR /usr/app
 COPY package*.json ormconfig.js ./
 RUN npm ci --production
 
+VOLUME /usr/app/upload
+
 COPY --from=builder /usr/app/dist ./dist
 
 ENV JWT_SECRET ='mon-token-secret' \
