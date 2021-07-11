@@ -30,7 +30,7 @@ routes.use('/bike', bike);
 routes.use('/bike-manufacturer', bikeManufacturer);
 routes.use('/bike-model', bikeModel);
 routes.use('bikeMaintenance', bikeMaintenance);
-routes.use('invoice', invoice);
+routes.use('/invoice', invoice);
 routes.use('issue', issue);
 routes.use('issueThread', issueThread);
 routes.use('/plan', plan);
