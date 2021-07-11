@@ -56,15 +56,11 @@ export default class BikeService extends CRUD<Bike> {
     let count: number;
     if (searchQuery) {
       bikes = await this.repo.find({
+        relations: ['model', 'model.bikeManufacturer'],
         where: [
           { matriculate: Like(`%${searchQuery}%`) },
           { batteryPercent: Like(`%${searchQuery}%`) },
           { status: Like(`%${searchQuery}%`) },
-          {
-            model: {
-              name: Like(`%${searchQuery}%`),
-            },
-          },
         ],
         take: params.limit,
         skip: params.offset,
@@ -74,15 +70,11 @@ export default class BikeService extends CRUD<Bike> {
           { matriculate: Like(`%${searchQuery}%`) },
           { batteryPercent: Like(`%${searchQuery}%`) },
           { status: Like(`%${searchQuery}%`) },
-          {
-            model: {
-              name: Like(`%${searchQuery}%`),
-            },
-          },
         ],
       });
     } else {
       bikes = await this.repo.find({
+        relations: ['model', 'model.bikeManufacturer'],
         take: params.limit,
         skip: params.offset,
       });
