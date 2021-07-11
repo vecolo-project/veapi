@@ -73,7 +73,7 @@ route.post(
 route.get(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);

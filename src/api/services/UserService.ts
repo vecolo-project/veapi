@@ -44,14 +44,19 @@ export default class UserService extends CRUD<User> {
     const errors = await validate(newUser, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
 
     const foundUser = await this.userRepo.findOne({ email: newUser.email });
-    if (foundUser)
+    if (foundUser) {
       throw new ErrorHandler(400, 'The email address already exists');
+    }
 
     const userRecord: User = await this.userRepo.save(newUser);
-    if (!userRecord) throw new ErrorHandler(500, 'User cannot be created');
+    if (!userRecord) {
+      throw new ErrorHandler(500, 'User cannot be created');
+    }
 
     const token = this.generateToken(userRecord);
     const user = userRecord;
@@ -62,7 +67,9 @@ export default class UserService extends CRUD<User> {
   async login(email: string, password: string): Promise<UserResponse> {
     this.logger.debug('Authenticating user...');
     const userRecord = await this.userRepo.findOne({ email });
-    if (!userRecord) throw new ErrorHandler(401, 'Invalid email or password');
+    if (!userRecord) {
+      throw new ErrorHandler(401, 'Invalid email or password');
+    }
 
     const validPassword = await bcrypt.compare(password, userRecord.password);
 
