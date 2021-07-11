@@ -31,3 +31,9 @@ jobs:
           context: .
           push: true
           tags: registry.vecolo.fr/veapi-ci:latest
+      
+      - name: Trigger API Webhook reload service
+        uses: joelwmale/webhook-action@2.1.0
+        with:
+          url: ${{ secrets.WEBHOOK_URL }}
+
