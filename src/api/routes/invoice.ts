@@ -101,20 +101,35 @@ route.put(
   }
 );
 
+route.get('/me/', isAuth, attachUser, async (req: userRequest, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const [invoices, count] = await service.getAllFromUser(req.currentUser.id, {
+      offset,
+      limit,
+    });
+    return res.status(200).json({ invoices, count });
+  } catch (e) {
+    return next(e);
+  }
+});
 route.get(
-  '/' + 'me/',
+  '/user/:id',
   isAuth,
-  attachUser,
+  checkRole(Role.STAFF),
   async (req: userRequest, res, next) => {
     try {
       const service = Container.get(defaultService);
       const offset = Number(req.query.offset) || 0;
       const limit = Number(req.query.limit) || 20;
-      const entityResult = await service.getAllFromUser(req.currentUser.id, {
+      const userId = Number.parseInt(req.params.id, 10);
+      const [invoices, count] = await service.getAllFromUser(userId, {
         offset,
         limit,
       });
-      return res.status(200).json(entityResult);
+      return res.status(200).json({ invoices, count });
     } catch (e) {
       return next(e);
     }
@@ -122,7 +137,7 @@ route.get(
 );
 
 route.get(
-  '/' + 'me/:id',
+  '/me/:id',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {
