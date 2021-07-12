@@ -8,10 +8,9 @@ import EmailSenderService from '../services/EmailSenderService';
 const route = Router();
 const sendSimpleUserMailCheck = celebrate({
   body: Joi.object({
-    email: Joi.string().email().required(),
+    userId: Joi.number().min(1),
     subject: Joi.string().min(1).required(),
     content: Joi.string().min(1).required(),
-    username: Joi.string().min(1).required(),
   }),
 });
 const sendNewsletterMailCheck = celebrate({
@@ -22,32 +21,40 @@ const sendNewsletterMailCheck = celebrate({
 });
 const defaultService = EmailSenderService;
 
-route.post('/simple', sendSimpleUserMailCheck, async (req, res, next) => {
-  const service = Container.get(defaultService);
-  try {
-    const result = await service.sendSimple(
-      req.body.email,
-      req.body.content,
-      req.body.subject,
-      req.body.username
-    );
-    return res.status(200).json(result);
-  } catch (e) {
-    return next(e);
+route.post(
+  '/simple',
+  isAuth,
+  checkRole(Role.STAFF),
+  sendSimpleUserMailCheck,
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      await service.sendSimple(
+        Number.parseInt(req.body.userId, 10),
+        req.body.content,
+        req.body.subject
+      );
+      return res.status(200).end();
+    } catch (e) {
+      return next(e);
+    }
   }
-});
+);
 
-route.post('/newsletter', sendNewsletterMailCheck, async (req, res, next) => {
-  const service = Container.get(defaultService);
-  try {
-    const result = await service.sendNewsletter(
-      req.body.content,
-      req.body.subject
-    );
-    return res.status(200).json(result);
-  } catch (e) {
-    return next(e);
+route.post(
+  '/newsletter',
+  isAuth,
+  checkRole(Role.STAFF),
+  sendNewsletterMailCheck,
+  async (req, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      await service.sendNewsletter(req.body.content, req.body.subject);
+      return res.status(200).end();
+    } catch (e) {
+      return next(e);
+    }
   }
-});
+);
 
 export default route;

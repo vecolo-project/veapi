@@ -2,6 +2,7 @@ import { Container, Service } from 'typedi';
 import sgMail from '@sendgrid/mail';
 import config from '../../config';
 import UserService from './UserService';
+import { User } from '../entities/User';
 
 const templates = {
   simple_mail: 'd-e22c21577502499fae3e3d03591bacf8',
@@ -20,22 +21,26 @@ export default class EmailSenderService {
     this.sendGrid.setApiKey(config.sendGridApiKey);
   }
 
-  public sendSimple(
-    email: string,
+  public async sendSimple(
+    userId: number,
     content: string,
-    subject: string,
-    username: string
+    subject: string
   ): Promise<any> {
+    const user: User = await this.userService.findOne(userId);
+
     const mail = {
-      to: email,
-      from: this.fromAdress,
-      subject: subject,
+      to: user.email,
+      from: {
+        email: this.fromAdress,
+        name: 'Vécolo',
+      },
+      subject: `${subject}`,
       templateId: templates.simple_mail,
 
       dynamic_template_data: {
-        subject: subject,
-        username: username,
-        content: content,
+        subject: `${subject}`,
+        username: user.pseudo,
+        content: `${content}`,
       },
     };
     return sgMail.send(mail);
@@ -43,7 +48,7 @@ export default class EmailSenderService {
 
   public async sendNewsletter(content: string, subject: string): Promise<void> {
     for (const user of await this.userService.newsletterUsers()) {
-      await this.sendSimple(user.email, content, subject, user.pseudo);
+      await this.sendSimple(user.id, content, subject);
     }
   }
 }
