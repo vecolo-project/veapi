@@ -29,11 +29,15 @@ export default class InvoiceService extends CRUD<Invoice> {
     });
   }
 
-  async getAllFromUser(id: number, param: getAllParams): Promise<Invoice[]> {
-    return await this.invoiceRepo.find({
+  async getAllFromUser(
+    id: number,
+    param: getAllParams
+  ): Promise<[Invoice[], number]> {
+    return await this.invoiceRepo.findAndCount({
       where: {
-        user: id,
+        user: { id },
       },
+      relations: ['subscription', 'subscription.plan'],
       take: param.limit,
       skip: param.offset,
       order: { createdAt: 'DESC' },

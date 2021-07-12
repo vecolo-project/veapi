@@ -118,8 +118,14 @@ route.get(
       const service = Container.get(defaultService);
       const offset = Number(req.query.offset) || 0;
       const limit = Number(req.query.limit) || 20;
-      const result = await service.find({ offset, limit });
-      return res.status(200).json(result);
+      const [subscriptions, count] = await service.getAllFromUser(
+        req.currentUser.id,
+        {
+          offset,
+          limit,
+        }
+      );
+      return res.status(200).json({ subscriptions, count });
     } catch (e) {
       return next(e);
     }
@@ -127,20 +133,36 @@ route.get(
 );
 
 route.get(
-  '/' + 'me/:id',
+  '/user/:id',
   isAuth,
   checkRole(Role.STAFF),
-  async (req, res, next) => {
+  async (req: userRequest, res, next) => {
     try {
       const service = Container.get(defaultService);
-      const id = Number.parseInt(req.params.id);
-      const entityResult = await service.findOne(id);
-      return res.status(200).json(entityResult);
+      const offset = Number(req.query.offset) || 0;
+      const limit = Number(req.query.limit) || 20;
+      const userId = Number.parseInt(req.params.id, 10);
+      const [subscriptions, count] = await service.getAllFromUser(userId, {
+        offset,
+        limit,
+      });
+      return res.status(200).json({ subscriptions, count });
     } catch (e) {
       return next(e);
     }
   }
 );
+
+route.get('/' + 'me/:id', isAuth, attachUser, async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.findOne(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
 
 route.post(
   '/' + 'add/',

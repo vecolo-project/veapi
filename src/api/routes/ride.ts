@@ -220,11 +220,34 @@ route.get(
       const service = Container.get(defaultService);
       const offset = Number(req.query.offset) || 0;
       const limit = Number(req.query.limit) || 20;
-      const result = await service.getAllRideFromUser(req.currentUser.id, {
+      const [rides, count] = await service.getAllRideFromUser(
+        req.currentUser.id,
+        {
+          offset,
+          limit,
+        }
+      );
+      return res.status(200).json({ rides, count });
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+route.get(
+  '/user/:id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req: userRequest, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const offset = Number(req.query.offset) || 0;
+      const limit = Number(req.query.limit) || 20;
+      const userId = Number.parseInt(req.params.id, 10);
+      const [rides, count] = await service.getAllRideFromUser(userId, {
         offset,
         limit,
       });
-      return res.status(200).json(result);
+      return res.status(200).json({ rides, count });
     } catch (e) {
       return next(e);
     }

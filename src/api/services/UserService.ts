@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import {
   User,
   UserCreationProps,
@@ -14,9 +14,12 @@ import { validate } from 'class-validator';
 import CRUD, { getAllParams } from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { Like } from 'typeorm';
+import SubscriptionService from './SubscriptionService';
+import {Subscription} from '../entities/Subscription';
 
 @Service()
 export default class UserService extends CRUD<User> {
+  private subscriptionService: SubscriptionService;
   constructor(
     @InjectRepository(User)
     protected userRepo: UserRepository,
@@ -24,6 +27,7 @@ export default class UserService extends CRUD<User> {
     protected logger: Logger
   ) {
     super(userRepo, logger);
+    this.subscriptionService = Container.get(SubscriptionService);
   }
 
   getRepo(): UserRepository {
@@ -44,14 +48,19 @@ export default class UserService extends CRUD<User> {
     const errors = await validate(newUser, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
 
     const foundUser = await this.userRepo.findOne({ email: newUser.email });
-    if (foundUser)
+    if (foundUser) {
       throw new ErrorHandler(400, 'The email address already exists');
+    }
 
     const userRecord: User = await this.userRepo.save(newUser);
-    if (!userRecord) throw new ErrorHandler(500, 'User cannot be created');
+    if (!userRecord) {
+      throw new ErrorHandler(500, 'User cannot be created');
+    }
 
     const token = this.generateToken(userRecord);
     const user = userRecord;
@@ -62,7 +71,9 @@ export default class UserService extends CRUD<User> {
   async login(email: string, password: string): Promise<UserResponse> {
     this.logger.debug('Authenticating user...');
     const userRecord = await this.userRepo.findOne({ email });
-    if (!userRecord) throw new ErrorHandler(401, 'Invalid email or password');
+    if (!userRecord) {
+      throw new ErrorHandler(401, 'Invalid email or password');
+    }
 
     const validPassword = await bcrypt.compare(password, userRecord.password);
 
@@ -128,6 +139,12 @@ export default class UserService extends CRUD<User> {
     const user = await this.repo.findOne(id);
     if (user) {
       Reflect.deleteProperty(user, 'password');
+    }
+    const subscription: Subscription = await this.subscriptionService.findLastFromUser(id);
+    if (subscription) {
+      user.subscriptions = [subscription];
+    } else {
+      user.subscriptions = [];
     }
     return user;
   }

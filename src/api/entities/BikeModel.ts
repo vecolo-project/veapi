@@ -46,10 +46,10 @@ export class BikeModel extends BaseEntity {
   @Column({ nullable: true })
   icon: string;
 
-  @OneToMany(() => Bike, (bike) => bike.station)
+  @OneToMany(() => Bike, (bike) => bike.model)
   bikes: Bike[];
 
-  @ManyToOne(() => BikeManufacturer, (bikeManufacturer) => bikeManufacturer.id)
+  @ManyToOne(() => BikeManufacturer, (bikeManufacturer) => bikeManufacturer.bikeModel)
   bikeManufacturer: BikeManufacturer;
 
   @CreateDateColumn()

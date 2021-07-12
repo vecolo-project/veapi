@@ -31,6 +31,28 @@ export default class SubscriptionService extends CRUD<Subscription> {
     });
   }
 
+  async getAllFromUser(
+    id: number,
+    params: getAllParams
+  ): Promise<[Subscription[], number]> {
+    return this.repo.findAndCount({
+      where: {
+        user: { id },
+      },
+      relations: ['plan'],
+      skip: params.offset,
+      take: params.limit,
+    });
+  }
+
+  async findLastFromUser(id: number): Promise<Subscription> {
+    return await this.repo.findOne({
+      where: { id },
+      relations: ['plan'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async getAllWithRelation(params: getAllParams): Promise<Subscription[]> {
     const result = await this.repo.find({
       relations: ['plan', 'user'],
@@ -64,7 +86,9 @@ export default class SubscriptionService extends CRUD<Subscription> {
     const errors = await validate(entity, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
     if (_.has(entity, 'updatedAt')) {
       entity['updatedAt'] = new Date();
     }
