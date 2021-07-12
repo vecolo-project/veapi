@@ -14,9 +14,15 @@ const sendSimpleUserMailCheck = celebrate({
     username: Joi.string().min(1).required(),
   }),
 });
+const sendNewsletterMailCheck = celebrate({
+  body: Joi.object({
+    subject: Joi.string().min(1).required(),
+    content: Joi.string().min(1).required(),
+  }),
+});
 const defaultService = EmailSenderService;
 
-route.post('/user/simple', sendSimpleUserMailCheck, async (req, res, next) => {
+route.post('/simple', sendSimpleUserMailCheck, async (req, res, next) => {
   const service = Container.get(defaultService);
   try {
     const result = await service.sendSimple(
@@ -24,6 +30,19 @@ route.post('/user/simple', sendSimpleUserMailCheck, async (req, res, next) => {
       req.body.content,
       req.body.subject,
       req.body.username
+    );
+    return res.status(200).json(result);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+route.post('/newsletter', sendNewsletterMailCheck, async (req, res, next) => {
+  const service = Container.get(defaultService);
+  try {
+    const result = await service.sendNewsletter(
+      req.body.content,
+      req.body.subject
     );
     return res.status(200).json(result);
   } catch (e) {

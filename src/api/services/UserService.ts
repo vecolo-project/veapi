@@ -15,7 +15,7 @@ import CRUD, { getAllParams } from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { Like } from 'typeorm';
 import SubscriptionService from './SubscriptionService';
-import {Subscription} from '../entities/Subscription';
+import { Subscription } from '../entities/Subscription';
 
 @Service()
 export default class UserService extends CRUD<User> {
@@ -135,12 +135,22 @@ export default class UserService extends CRUD<User> {
     return { users, count };
   }
 
+  async newsletterUsers(): Promise<User[]> {
+    return await this.repo.find({
+      where: {
+        newsletter: true,
+      },
+    });
+  }
+
   async findOne(id: number): Promise<User | undefined> {
     const user = await this.repo.findOne(id);
     if (user) {
       Reflect.deleteProperty(user, 'password');
     }
-    const subscription: Subscription = await this.subscriptionService.findLastFromUser(id);
+    const subscription: Subscription = await this.subscriptionService.findLastFromUser(
+      id
+    );
     if (subscription) {
       user.subscriptions = [subscription];
     } else {
