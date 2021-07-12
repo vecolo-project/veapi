@@ -26,7 +26,11 @@ ENV JWT_SECRET ='mon-token-secret' \
     PORT=3000 \
     LOG_LEVEL='debug' \
     ENDPOINT_PREFIX='' \
-    NODE_ENV='production'
+    NODE_ENV='production'\
+    SENDGRID_API_KEY=''\
+    SENDGRID_SEND_EMAIL=''\
+    SENDGRID_REPLY_EMAIL=''
+
 
 EXPOSE 3000
 CMD node dist/app.js
