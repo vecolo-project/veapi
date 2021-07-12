@@ -37,6 +37,7 @@ export default class InvoiceService extends CRUD<Invoice> {
       where: {
         user: { id },
       },
+      relations: ['subscription', 'subscription.plan'],
       take: param.limit,
       skip: param.offset,
       order: { createdAt: 'DESC' },
