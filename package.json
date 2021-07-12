@@ -50,6 +50,7 @@
   },
   "homepage": "https://github.com/vecolo-project/API",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.5",
     "bcrypt": "^5.0.0",
     "celebrate": "^13.0.3",
     "class-validator": "^0.12.2",
@@ -64,6 +65,7 @@
     "lodash": "^4.17.20",
     "mysql2": "^2.2.5",
     "reflect-metadata": "^0.1.13",
+    "sendgrid": "^5.2.3",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.26",
     "typeorm-typedi-extensions": "^0.2.3",
