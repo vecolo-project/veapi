@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import {
   User,
   UserCreationProps,
@@ -14,9 +14,12 @@ import { validate } from 'class-validator';
 import CRUD, { getAllParams } from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { Like } from 'typeorm';
+import SubscriptionService from './SubscriptionService';
+import {Subscription} from '../entities/Subscription';
 
 @Service()
 export default class UserService extends CRUD<User> {
+  private subscriptionService: SubscriptionService;
   constructor(
     @InjectRepository(User)
     protected userRepo: UserRepository,
@@ -24,6 +27,7 @@ export default class UserService extends CRUD<User> {
     protected logger: Logger
   ) {
     super(userRepo, logger);
+    this.subscriptionService = Container.get(SubscriptionService);
   }
 
   getRepo(): UserRepository {
@@ -135,6 +139,12 @@ export default class UserService extends CRUD<User> {
     const user = await this.repo.findOne(id);
     if (user) {
       Reflect.deleteProperty(user, 'password');
+    }
+    const subscription: Subscription = await this.subscriptionService.findLastFromUser(id);
+    if (subscription) {
+      user.subscriptions = [subscription];
+    } else {
+      user.subscriptions = [];
     }
     return user;
   }

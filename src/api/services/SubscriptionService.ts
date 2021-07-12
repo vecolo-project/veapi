@@ -30,6 +30,7 @@ export default class SubscriptionService extends CRUD<Subscription> {
       take: params.limit,
     });
   }
+
   async getAllFromUser(
     id: number,
     params: getAllParams
@@ -38,8 +39,17 @@ export default class SubscriptionService extends CRUD<Subscription> {
       where: {
         user: { id },
       },
+      relations: ['plan'],
       skip: params.offset,
       take: params.limit,
+    });
+  }
+
+  async findLastFromUser(id: number): Promise<Subscription> {
+    return await this.repo.findOne({
+      where: { id },
+      relations: ['plan'],
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -76,7 +86,9 @@ export default class SubscriptionService extends CRUD<Subscription> {
     const errors = await validate(entity, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
     if (_.has(entity, 'updatedAt')) {
       entity['updatedAt'] = new Date();
     }
