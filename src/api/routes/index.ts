@@ -15,6 +15,7 @@ import stationMaintenance from './stationMaintenanceThread';
 import subscription from './subscription';
 import bikeManufacturer from './bikeManufacturer';
 import bikeModel from './bikeModel';
+import email from './email';
 
 const routes = Router();
 
@@ -37,5 +38,6 @@ routes.use('/plan', plan);
 routes.use('/ride', ride);
 routes.use('stationMaintenance', stationMaintenance);
 routes.use('/subscription', subscription);
+routes.use('/email', email);
 
 export default routes;
