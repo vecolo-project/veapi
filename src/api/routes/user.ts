@@ -115,7 +115,7 @@ route.put(
       isActive: Joi.boolean().required(),
       password: Joi.string().min(7),
       email: Joi.string().email().required(),
-      pseudo: Joi.string().min(7).required(),
+      pseudo: Joi.string().min(4).required(),
       newsletter: Joi.boolean().required(),
       role: Joi.string()
         .allow('ADMIN', 'CLIENT', 'STAFF', 'STATION')
@@ -149,7 +149,7 @@ route.patch(
       lastName: Joi.string().min(1),
       birthDate: Joi.date().max('now'),
       email: Joi.string().email(),
-      pseudo: Joi.string().min(7),
+      pseudo: Joi.string().min(4),
       newsletter: Joi.boolean(),
     }),
   }),
