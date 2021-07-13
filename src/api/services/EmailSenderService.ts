@@ -34,13 +34,13 @@ export default class EmailSenderService {
         email: this.fromAdress,
         name: 'Vécolo',
       },
-      subject: `${subject}`,
+      subject: subject,
       templateId: templates.simple_mail,
 
       dynamic_template_data: {
-        subject: `${subject}`,
+        subject: subject,
         username: user.pseudo,
-        content: `${content}`,
+        content: content,
       },
     };
     return sgMail.send(mail);

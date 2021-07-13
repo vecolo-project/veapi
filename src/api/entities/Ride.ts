@@ -40,7 +40,7 @@ export class Ride extends BaseEntity {
   @Column()
   rideLength: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   invoiceAmount: number;
 
   @UpdateDateColumn()
