@@ -78,11 +78,13 @@ export default class StatisticsService {
   async getMonthUserSubscription(month: number, year: number): Promise<any> {
     const startDate = startOfMonth(setYear(setMonth(new Date(), month), year));
     const endDate = endOfMonth(startDate);
-    return await this.userService.getRepo().count({
+    const monthCount = await this.userService.getRepo().count({
       where: {
         createdAt: Between(startDate, endDate),
       },
     });
+    const total = await this.userService.getRepo().count();
+    return { monthCount, total };
   }
 
   async getRideMonthCount(month: number, year: number): Promise<any> {
@@ -95,6 +97,7 @@ export default class StatisticsService {
       .select('COUNT(ride.id)', 'totalRide')
       .addSelect('DAY(ride.createdAt)', 'day')
       .addSelect('SUM(ride.rideLength)', 'totalLength')
+      .addSelect('SUM(ride.duration)', 'totalDuration')
       .where(
         "ride.createdAt BETWEEN '" +
           startDate.toISOString() +
