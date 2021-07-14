@@ -6,17 +6,20 @@ import { User } from '../entities/User';
 
 const templates = {
   simple_mail: 'd-e22c21577502499fae3e3d03591bacf8',
+  contact_form: 'd-9364b3c533bb400180465bfca372e549',
 };
 
 @Service()
 export default class EmailSenderService {
   private sendGrid;
   private readonly fromAdress: string;
+  private readonly contactAddress: string;
   private userService: UserService;
 
   constructor() {
     this.userService = Container.get(UserService);
     this.fromAdress = config.sendgridFromEmail;
+    this.contactAddress = config.sendgridReplyEmail;
     this.sendGrid = sgMail;
     this.sendGrid.setApiKey(config.sendGridApiKey);
   }
@@ -50,5 +53,35 @@ export default class EmailSenderService {
     for (const user of await this.userService.newsletterUsers()) {
       await this.sendSimple(user.id, content, subject);
     }
+  }
+
+  public async sendContactForm(
+    firstname: string,
+    lastname: string,
+    content: string,
+    email: string,
+    phone: string,
+    enterprise?: string
+  ): Promise<any> {
+    const mail = {
+      to: this.contactAddress,
+      from: {
+        email: this.fromAdress,
+        name: 'Vécolo contact',
+      },
+      subject: 'Formulaire de contact',
+      templateId: templates.contact_form,
+
+      dynamic_template_data: {
+        subject: 'Formulaire de contact',
+        firstname,
+        lastname,
+        content,
+        email,
+        phone,
+        enterprise,
+      },
+    };
+    return sgMail.send(mail);
   }
 }
