@@ -51,7 +51,8 @@ export default class BikeService extends CRUD<Bike> {
   async search(
     params: getAllParams,
     searchQuery?: any
-  ): Promise<{ bikes: Bike[]; count: number }> {
+  ): Promise<[Bike[], number]> {
+    /*
     let bikes: Bike[];
     let count: number;
     if (searchQuery) {
@@ -81,5 +82,18 @@ export default class BikeService extends CRUD<Bike> {
       count = await this.repo.count();
     }
     return { bikes, count };
+*/
+    return this.bikeRepo
+      .createQueryBuilder('bike')
+      .leftJoinAndSelect('bike.model', 'model')
+      .leftJoinAndSelect('model.bikeManufacturer', 'manufacturer')
+      .where(`bike.matriculate LIKE ('%${searchQuery}%')`)
+      .orWhere(`bike.batteryPercent LIKE ('%${searchQuery}%')`)
+      .orWhere(`bike.status LIKE ('%${searchQuery}%')`)
+      .orWhere(`model.name LIKE ('%${searchQuery}%')`)
+      .orWhere(`manufacturer.name LIKE ('%${searchQuery}%')`)
+      .skip(params.offset)
+      .take(params.limit)
+      .getManyAndCount();
   }
 }

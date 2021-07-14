@@ -47,10 +47,7 @@ route.get('/', async (req, res, next) => {
     const limit = Number(req.query.limit) || 20;
     const searchQuery = req.query.searchQuery || '';
 
-    const { bikes, count } = await service.search(
-      { offset, limit },
-      searchQuery
-    );
+    const [bikes, count] = await service.search({ offset, limit }, searchQuery);
     return res.status(200).json({ bikes, count });
   } catch (e) {
     return next(e);
