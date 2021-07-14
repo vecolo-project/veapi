@@ -56,7 +56,14 @@ export default class RideService extends CRUD<Ride> {
 
   async findOne(id: number): Promise<Ride> {
     return await this.rideRepo.findOne(id, {
-      relations: ['user', 'bike', 'startStation', 'endStation'],
+      relations: [
+        'user',
+        'bike',
+        'bike.model',
+        'bike.model.bikeManufacturer',
+        'startStation',
+        'endStation',
+      ],
     });
   }
 

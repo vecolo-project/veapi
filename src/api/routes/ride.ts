@@ -11,44 +11,45 @@ const paramsRules = celebrate({
   body: Joi.object({
     id: Joi.number().optional(),
     duration: Joi.number().min(0).required(),
-    startStation: Joi.number().min(0).required(),
-    endStation: Joi.number().min(0).required(),
-    user: Joi.number().min(0).required(),
+    startStation: Joi.object().required(),
+    endStation: Joi.object().required(),
+    user: Joi.object().required(),
+    bike: Joi.object().required(),
     rideLength: Joi.number().min(0).required(),
     invoiceAmount: Joi.number().min(0).required(),
+    createdAt: Joi.date().optional()
   }),
 });
 const defaultService = RideService;
 
-route.post('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
-  const service = Container.get(defaultService);
-  try {
-    const entityResult = await service.create(req.body);
-    return res.status(201).json(entityResult);
-  } catch (e) {
-    return next(e);
-  }
-});
-
-route.get(
+route.post(
   '/',
-  // isAuth, checkRole(Role.STAFF),
+  isAuth,
+  checkRole(Role.STAFF),
+  paramsRules,
   async (req, res, next) => {
+    const service = Container.get(defaultService);
     try {
-      const service = Container.get(defaultService);
-      const offset = Number(req.query.offset) || 0;
-      const limit = Number(req.query.limit) || 20;
-      const searchQuery = req.query.searchQuery || '';
-      const [rides, count] = await service.search(
-        { offset, limit },
-        searchQuery
-      );
-      return res.status(200).json({ rides, count });
+      const entityResult = await service.create(req.body);
+      return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
     }
   }
 );
+
+route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const searchQuery = req.query.searchQuery || '';
+    const [rides, count] = await service.search({ offset, limit }, searchQuery);
+    return res.status(200).json({ rides, count });
+  } catch (e) {
+    return next(e);
+  }
+});
 
 route.get('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
