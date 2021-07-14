@@ -158,4 +158,8 @@ export default class UserService extends CRUD<User> {
     }
     return user;
   }
+
+  async findOneWithPassword(id: number): Promise<User | undefined> {
+    return await this.repo.findOne(id);
+  }
 }
