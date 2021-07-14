@@ -46,22 +46,6 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   }
 });
 
-route.get(
-  '/' + ':id',
-  isAuth,
-  checkRole(Role.STAFF),
-  async (req, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const id = Number.parseInt(req.params.id);
-      const entityResult = await service.findOne(id);
-      return res.status(200).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
-
 route.delete(
   '/' + ':id',
   isAuth,
@@ -115,6 +99,22 @@ route.get('/me/', isAuth, attachUser, async (req: userRequest, res, next) => {
     return next(e);
   }
 });
+
+route.get(
+  '/' + ':id',
+  isAuth,
+  checkRole(Role.STAFF),
+  async (req, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const id = Number.parseInt(req.params.id);
+      const entityResult = await service.findOne(id);
+      return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
 route.get(
   '/user/:id',
   isAuth,

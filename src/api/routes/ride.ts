@@ -17,7 +17,7 @@ const paramsRules = celebrate({
     bike: Joi.object().required(),
     rideLength: Joi.number().min(0).required(),
     invoiceAmount: Joi.number().min(0).required(),
-    createdAt: Joi.date().optional()
+    createdAt: Joi.date().optional(),
   }),
 });
 const defaultService = RideService;
@@ -51,19 +51,8 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   }
 });
 
-route.get('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
-  try {
-    const service = Container.get(defaultService);
-    const id = Number.parseInt(req.params.id);
-    const entityResult = await service.findOne(id);
-    return res.status(200).json(entityResult);
-  } catch (e) {
-    return next(e);
-  }
-});
-
 route.get(
-  '/station/' + ':id',
+  '/station/:id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -86,8 +75,9 @@ route.get(
     }
   }
 );
+
 route.get(
-  '/bike/' + ':id',
+  '/bike/:id',
   isAuth,
   checkRole(Role.STAFF),
   async (req, res, next) => {
@@ -107,7 +97,6 @@ route.get(
     }
   }
 );
-
 route.delete('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
@@ -191,8 +180,26 @@ route.patch(
   }
 );
 
+route.get('/me/', isAuth, attachUser, async (req: userRequest, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const [rides, count] = await service.getAllRideFromUser(
+      req.currentUser.id,
+      {
+        offset,
+        limit,
+      }
+    );
+    return res.status(200).json({ rides, count });
+  } catch (e) {
+    return next(e);
+  }
+});
+
 route.get(
-  '/' + 'me/:id',
+  '/me/:id',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {
@@ -211,28 +218,6 @@ route.get(
   }
 );
 
-route.get(
-  '/' + 'me/',
-  isAuth,
-  attachUser,
-  async (req: userRequest, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const offset = Number(req.query.offset) || 0;
-      const limit = Number(req.query.limit) || 20;
-      const [rides, count] = await service.getAllRideFromUser(
-        req.currentUser.id,
-        {
-          offset,
-          limit,
-        }
-      );
-      return res.status(200).json({ rides, count });
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
 route.get(
   '/user/:id',
   isAuth,
@@ -253,5 +238,16 @@ route.get(
     }
   }
 );
+
+route.get('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.findOne(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
 
 export default route;

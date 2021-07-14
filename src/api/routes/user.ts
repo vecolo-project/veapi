@@ -48,11 +48,20 @@ route.get(
   }
 );
 
-route.get('/current', isAuth, attachUser, (req: userRequest, res: Response) => {
-  const logger: Logger = Container.get('logger');
-  logger.debug('Calling GET /user/current endpoint');
-  return res.json({ user: req.currentUser }).status(200);
-});
+route.get(
+  '/current',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res: Response) => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling GET /user/current endpoint');
+
+    const service = Container.get(defaultService);
+    const entityResult = await service.findOne(req.currentUser.id);
+
+    return res.json({ user: entityResult }).status(200);
+  }
+);
 
 route.put(
   '/current',
