@@ -13,6 +13,16 @@ const sendSimpleUserMailCheck = celebrate({
     content: Joi.string().min(1).required(),
   }),
 });
+const sendContactFormMailCheck = celebrate({
+  body: Joi.object({
+    firstname: Joi.string().required(),
+    lastname: Joi.string().required(),
+    content: Joi.string().required(),
+    email: Joi.string().required(),
+    phone: Joi.string().required(),
+    enterprise: Joi.string().optional(),
+  }),
+});
 const sendNewsletterMailCheck = celebrate({
   body: Joi.object({
     subject: Joi.string().min(1).required(),
@@ -40,6 +50,23 @@ route.post(
     }
   }
 );
+
+route.post('/contact', sendContactFormMailCheck, async (req, res, next) => {
+  const service = Container.get(defaultService);
+  try {
+    await service.sendContactForm(
+      req.body.firstname,
+      req.body.lastname,
+      req.body.content,
+      req.body.email,
+      req.body.phone,
+      req.body.enterprise || null
+    );
+    return res.status(200).end();
+  } catch (e) {
+    return next(e);
+  }
+});
 
 route.post(
   '/newsletter',

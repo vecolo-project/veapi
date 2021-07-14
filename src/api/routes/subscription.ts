@@ -49,22 +49,6 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   }
 });
 
-route.get(
-  '/' + ':id',
-  isAuth,
-  checkRole(Role.STAFF),
-  async (req, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const id = Number.parseInt(req.params.id);
-      const entityResult = await service.getOneWithRelation(id);
-      return res.status(200).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
-
 route.delete(
   '/' + ':id',
   isAuth,
@@ -93,7 +77,7 @@ route.delete(
 );
 
 route.put(
-  '/' + ':id',
+  '/:id',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,
@@ -109,28 +93,34 @@ route.put(
   }
 );
 
-route.get(
-  '/' + 'me/',
-  isAuth,
-  attachUser,
-  async (req: userRequest, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const offset = Number(req.query.offset) || 0;
-      const limit = Number(req.query.limit) || 20;
-      const [subscriptions, count] = await service.getAllFromUser(
-        req.currentUser.id,
-        {
-          offset,
-          limit,
-        }
-      );
-      return res.status(200).json({ subscriptions, count });
-    } catch (e) {
-      return next(e);
-    }
+route.get('/me', isAuth, attachUser, async (req: userRequest, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const [subscriptions, count] = await service.getAllFromUser(
+      req.currentUser.id,
+      {
+        offset,
+        limit,
+      }
+    );
+    return res.status(200).json({ subscriptions, count });
+  } catch (e) {
+    return next(e);
   }
-);
+});
+
+route.get('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.getOneWithRelation(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
 
 route.get(
   '/user/:id',
