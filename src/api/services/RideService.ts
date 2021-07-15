@@ -1,11 +1,16 @@
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { Ride, RideRepository } from '../entities/Ride';
+import { Bike } from '../entities/Bike';
+import { Station } from '../entities/Station';
+import { User } from '../entities/User';
+import SubscriptionService from './SubscriptionService';
 
 @Service()
 export default class RideService extends CRUD<Ride> {
+  private subscriptionService: SubscriptionService;
   constructor(
     @InjectRepository(Ride)
     protected rideRepo: RideRepository,
@@ -13,6 +18,7 @@ export default class RideService extends CRUD<Ride> {
     protected logger: Logger
   ) {
     super(rideRepo, logger);
+    this.subscriptionService = Container.get(SubscriptionService);
   }
 
   async getAllRideFromUser(
@@ -106,4 +112,14 @@ export default class RideService extends CRUD<Ride> {
     }
     return result;
   }
+
+  async startRide(
+    bike: Bike,
+    startStation: Station,
+    user: User
+  ): Promise<Ride> {}
+
+  async getCurrentRide(user: User): Promise<Ride> {}
+
+  async endRide(ride: Ride, endStation: Station): Promise<Ride> {}
 }
