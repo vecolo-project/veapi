@@ -50,7 +50,7 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
 });
 
 route.delete(
-  '/' + ':id',
+  '/:id',
   isAuth,
   checkRole(Role.ADMIN),
   async (req, res, next) => {
@@ -111,6 +111,21 @@ route.get('/me', isAuth, attachUser, async (req: userRequest, res, next) => {
   }
 });
 
+route.get(
+  '/current',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const subscription = await service.findLastFromUser(req.currentUser.id);
+      return res.status(200).json(subscription);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
 route.get('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
@@ -143,7 +158,7 @@ route.get(
   }
 );
 
-route.get('/' + 'me/:id', isAuth, attachUser, async (req, res, next) => {
+route.get('/me/:id', isAuth, attachUser, async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
@@ -155,7 +170,7 @@ route.get('/' + 'me/:id', isAuth, attachUser, async (req, res, next) => {
 });
 
 route.post(
-  '/' + 'add/',
+  '/add/',
   isAuth,
   attachUser,
   celebrate({
@@ -178,8 +193,8 @@ route.post(
   }
 );
 
-route.patch(
-  '/' + 'cancel/:id',
+route.delete(
+  '/cancel/:id',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {

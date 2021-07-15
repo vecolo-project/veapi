@@ -1,11 +1,26 @@
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { Ride, RideRepository } from '../entities/Ride';
+import { Bike } from '../entities/Bike';
+import { Station } from '../entities/Station';
+import { User } from '../entities/User';
+import SubscriptionService from './SubscriptionService';
+import InvoiceService from './InvoiceService';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
+import { Plan } from '../entities/Plan';
+import { differenceInMinutes } from 'date-fns';
+import { max } from 'class-validator';
+import { Subscription } from '../entities/Subscription';
+import BikeService from './BikeService';
 
 @Service()
 export default class RideService extends CRUD<Ride> {
+  private subscriptionService: SubscriptionService;
+  private bikeService: BikeService;
+  private invoiceService: InvoiceService;
+
   constructor(
     @InjectRepository(Ride)
     protected rideRepo: RideRepository,
@@ -13,6 +28,9 @@ export default class RideService extends CRUD<Ride> {
     protected logger: Logger
   ) {
     super(rideRepo, logger);
+    this.subscriptionService = Container.get(SubscriptionService);
+    this.bikeService = Container.get(BikeService);
+    this.invoiceService = Container.get(InvoiceService);
   }
 
   async getAllRideFromUser(
@@ -105,5 +123,78 @@ export default class RideService extends CRUD<Ride> {
       Reflect.deleteProperty(ride.user, 'password');
     }
     return result;
+  }
+
+  async startRide(
+    bike: Bike,
+    startStation: Station,
+    user: User
+  ): Promise<Ride> {
+    bike = await this.bikeService.findWithStationAndModel(bike.id);
+    const userSubscription = await this.subscriptionService.findLastFromUser(
+      user.id
+    );
+    if (!userSubscription) {
+      throw new ErrorHandler(403, "Vous ne possedez pas d'abonnement actif");
+    }
+    if (await this.getCurrentRide(user)) {
+      throw new ErrorHandler(403, 'Vous avez déjà une course en cours');
+    }
+    if (bike.station.id != startStation.id) {
+      throw new ErrorHandler(403, "Ce vélo n'appartient pas à la station");
+    }
+    const ride: any = {
+      bike,
+      user,
+      startStation,
+    };
+    return await this.create(ride);
+  }
+
+  async getCurrentRide(user: User): Promise<Ride> {
+    return await this.getRepo().findOne({
+      where: {
+        user: { id: user.id },
+        endStation: null,
+      },
+    });
+  }
+
+  async endRide(
+    user: User,
+    ride: Ride,
+    endStation: Station,
+    length: number
+  ): Promise<Ride> {
+    ride = await this.getRepo().findOne({
+      where: { id: ride.id, user: { id: user.id } },
+    });
+    if (!ride) {
+      throw new ErrorHandler(404, 'Erreur avec la course !');
+    }
+    const userSubscription: Subscription =
+      await this.subscriptionService.findLastFromUser(user.id);
+    if (!userSubscription) {
+      throw new ErrorHandler(403, "Vous ne possedez pas d'abonnement actif");
+    }
+    const plan: Plan = userSubscription.plan;
+    const minutes = differenceInMinutes(new Date(), ride.createdAt);
+    const invoiceAmount =
+      Math.max(0, minutes - plan.freeMinutes) * plan.costPerMinute;
+
+    ride.duration = minutes;
+    ride.rideLength = length;
+    ride.endStation = endStation;
+
+    ride = await this.update(ride.id, ride);
+
+    const invoice: any = {
+      billingDate: new Date(),
+      amount: invoiceAmount,
+      user: user,
+      subscription: userSubscription,
+    };
+    await this.invoiceService.create(invoice);
+    return ride;
   }
 }

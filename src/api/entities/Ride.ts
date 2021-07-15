@@ -22,13 +22,13 @@ export class Ride extends BaseEntity {
   /**
    * substration of 2 timestamp
    */
-  @Column()
+  @Column({ nullable: true })
   duration: number;
 
   @ManyToOne(() => Station, (station) => station.id)
   startStation: Station;
 
-  @ManyToOne(() => Station, (station) => station.id)
+  @ManyToOne(() => Station, (station) => station.id, { nullable: true })
   endStation: Station;
 
   @ManyToOne(() => User, (user) => user.id)
@@ -37,10 +37,16 @@ export class Ride extends BaseEntity {
   @ManyToOne(() => Bike, (bike) => bike.id)
   bike: Bike;
 
-  @Column()
+  @Column({ nullable: true })
   rideLength: number;
 
-  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    default: 0,
+    nullable: true,
+  })
   invoiceAmount: number;
 
   @UpdateDateColumn()

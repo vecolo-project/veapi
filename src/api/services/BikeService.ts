@@ -47,7 +47,6 @@ export default class BikeService extends CRUD<Bike> {
       relations: ['model', 'model.bikeManufacturer', 'station'],
     });
   }
-
   async search(
     params: getAllParams,
     searchQuery?: any

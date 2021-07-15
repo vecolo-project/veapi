@@ -6,6 +6,7 @@ import { Subscription, SubscriptionRepository } from '../entities/Subscription';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { validate } from 'class-validator';
 import _ from 'lodash';
+import { addMonths } from 'date-fns';
 
 @Service()
 export default class SubscriptionService extends CRUD<Subscription> {
@@ -46,11 +47,18 @@ export default class SubscriptionService extends CRUD<Subscription> {
   }
 
   async findLastFromUser(id: number): Promise<Subscription> {
-    return await this.repo.findOne({
+    const subscription = await this.repo.findOne({
       where: { id },
       relations: ['plan'],
       order: { createdAt: 'DESC' },
     });
+    if (
+      addMonths(new Date(subscription.startDate), subscription.monthDuration) >=
+      new Date()
+    ) {
+      return subscription;
+    }
+    return undefined;
   }
 
   async getAllWithRelation(params: getAllParams): Promise<Subscription[]> {
