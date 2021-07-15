@@ -81,9 +81,8 @@ export default class UserService extends CRUD<User> {
       const token = this.generateToken(userRecord);
       const user = userRecord;
 
-      const subscription: Subscription = await this.subscriptionService.findLastFromUser(
-        user.id
-      );
+      const subscription: Subscription =
+        await this.subscriptionService.findLastFromUser(user.id);
       if (subscription) {
         user.subscriptions = [subscription];
       } else {
@@ -158,9 +157,8 @@ export default class UserService extends CRUD<User> {
     if (user) {
       Reflect.deleteProperty(user, 'password');
     }
-    const subscription: Subscription = await this.subscriptionService.findLastFromUser(
-      id
-    );
+    const subscription: Subscription =
+      await this.subscriptionService.findLastFromUser(id);
     if (subscription) {
       user.subscriptions = [subscription];
     } else {
