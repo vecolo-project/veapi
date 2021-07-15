@@ -13,10 +13,12 @@ import { Plan } from '../entities/Plan';
 import { differenceInMinutes } from 'date-fns';
 import { max } from 'class-validator';
 import { Subscription } from '../entities/Subscription';
+import BikeService from './BikeService';
 
 @Service()
 export default class RideService extends CRUD<Ride> {
   private subscriptionService: SubscriptionService;
+  private bikeService: BikeService;
   private invoiceService: InvoiceService;
 
   constructor(
@@ -27,6 +29,7 @@ export default class RideService extends CRUD<Ride> {
   ) {
     super(rideRepo, logger);
     this.subscriptionService = Container.get(SubscriptionService);
+    this.bikeService = Container.get(BikeService);
     this.invoiceService = Container.get(InvoiceService);
   }
 
@@ -127,6 +130,7 @@ export default class RideService extends CRUD<Ride> {
     startStation: Station,
     user: User
   ): Promise<Ride> {
+    bike = await this.bikeService.findWithStationAndModel(bike.id);
     const userSubscription = await this.subscriptionService.findLastFromUser(
       user.id
     );
@@ -135,6 +139,9 @@ export default class RideService extends CRUD<Ride> {
     }
     if (await this.getCurrentRide(user)) {
       throw new ErrorHandler(403, 'Vous avez déjà une course en cours');
+    }
+    if (bike.station.id != startStation.id) {
+      throw new ErrorHandler(403, "Ce vélo n'appartient pas à la station");
     }
     const ride: any = {
       bike,

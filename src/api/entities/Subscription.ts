@@ -37,7 +37,7 @@ export class Subscription {
   @ManyToOne(() => Plan, (plan) => plan.id)
   plan: Plan;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { nullable: false })
   user: User;
 
   @OneToMany(() => Invoice, (invoice) => invoice.subscription)

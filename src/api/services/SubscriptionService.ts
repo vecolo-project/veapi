@@ -53,7 +53,7 @@ export default class SubscriptionService extends CRUD<Subscription> {
       order: { createdAt: 'DESC' },
     });
     if (
-      addMonths(subscription.startDate, subscription.monthDuration) >=
+      addMonths(new Date(subscription.startDate), subscription.monthDuration) >=
       new Date()
     ) {
       return subscription;
