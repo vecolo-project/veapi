@@ -43,5 +43,9 @@ export default class SchedulerService {
         `stationMonitoring.createdAt BETWEEN '${start7DayAgo.toISOString()}' AND '${start1MonthAgo.toISOString()}'`
       )
       .andWhere('stationMonitoring.id mod 180 != 0');
+
+    await this.stationMonitoringService
+      .getRepo()
+      .query('optimize table station_monitoring');
   }
 }
