@@ -20,6 +20,22 @@ const paramsRules = celebrate({
     createdAt: Joi.date().optional(),
   }),
 });
+
+const startRideRules = celebrate({
+  body: Joi.object({
+    startStation: Joi.object().required(),
+    bike: Joi.object().required(),
+  }),
+});
+
+const endRideRules = celebrate({
+  body: Joi.object({
+    endStation: Joi.object().required(),
+    ride: Joi.object().required(),
+    length: Joi.number().min(1),
+  }),
+});
+
 const defaultService = RideService;
 
 route.post(
@@ -97,6 +113,7 @@ route.get(
     }
   }
 );
+
 route.delete('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
@@ -126,24 +143,18 @@ route.put(
 );
 
 route.post(
-  '/' + 'order/',
+  '/start',
   isAuth,
   attachUser,
-  celebrate({
-    body: Joi.object({
-      startStation: Joi.number().min(0).required(),
-      bike: Joi.number().min(0).required(),
-    }),
-  }),
+  startRideRules,
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
-    req.body.user = req.currentUser.id;
-    req.body.endStation = 0;
-    req.body.duration = 0;
-    req.body.rideLength = 0;
-    req.body.invoiceAmount = 0;
     try {
-      const entityResult = await service.create(req.body);
+      const entityResult = await service.startRide(
+        req.body.bike,
+        req.body.startStation,
+        req.currentUser
+      );
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
@@ -151,29 +162,35 @@ route.post(
   }
 );
 
-route.patch(
-  '/' + 'order/:id',
+route.post(
+  '/end',
   isAuth,
   attachUser,
-  celebrate({
-    body: Joi.object({
-      endStation: Joi.number().min(0).required(),
-      rideLength: Joi.number().min(0).required(),
-    }),
-  }),
+  endRideRules,
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     try {
-      const id = Number.parseInt(req.params.id);
-      const currentRide = await service.findOne(id);
-      if (currentRide.user.id != req.currentUser.id) {
-        res.status(401).end();
-        return;
-      }
-      req.body.duration =
-        Date.now().valueOf() - currentRide.createdAt.valueOf();
-      const entityResult = await service.update(id, req.body);
+      const entityResult = await service.endRide(
+        req.currentUser,
+        req.body.ride,
+        req.body.endStation,
+        req.body.length
+      );
       return res.status(201).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+route.get(
+  '/current',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res, next) => {
+    const service = Container.get(defaultService);
+    try {
+      const entityResult = await service.getCurrentRide(req.currentUser);
+      return res.status(200).json(entityResult);
     } catch (e) {
       return next(e);
     }
