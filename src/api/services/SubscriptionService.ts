@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
@@ -7,9 +7,13 @@ import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { validate } from 'class-validator';
 import _ from 'lodash';
 import { addMonths } from 'date-fns';
+import InvoiceService from './InvoiceService';
+import { User } from '../entities/User';
 
 @Service()
 export default class SubscriptionService extends CRUD<Subscription> {
+  invoiceService: InvoiceService;
+
   constructor(
     @InjectRepository(Subscription)
     protected subscriptionRepo: SubscriptionRepository,
@@ -17,6 +21,7 @@ export default class SubscriptionService extends CRUD<Subscription> {
     protected logger: Logger
   ) {
     super(subscriptionRepo, logger);
+    this.invoiceService = Container.get(InvoiceService);
   }
 
   async getAllFromPlan(
@@ -101,5 +106,16 @@ export default class SubscriptionService extends CRUD<Subscription> {
       entity['updatedAt'] = new Date();
     }
     return await this.repo.save(entity);
+  }
+
+  async createS(subscription: Subscription, user: User): Promise<Subscription> {
+    const invoice: any = {
+      billingDate: new Date(),
+      amount: subscription.plan?.price,
+      user: user,
+      subscription: subscription,
+    };
+    await this.invoiceService.create(invoice);
+    return await this.create(subscription);
   }
 }
