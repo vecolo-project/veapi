@@ -8,4 +8,10 @@ export default (): void => {
     const service = Container.get(SchedulerService);
     service.purgeMonitoring();
   });
+
+  schedule.scheduleJob('0 3 1 * *', async () => {
+    console.log('Generate monthly subscriptions invoice');
+    const service = Container.get(SchedulerService);
+    service.genereateMonthlyUsersInvoice();
+  });
 };

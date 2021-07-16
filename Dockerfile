@@ -15,6 +15,7 @@ RUN npm ci --production
 VOLUME /usr/app/upload
 
 COPY --from=builder /usr/app/dist ./dist
+COPY ./media ./media
 
 ENV JWT_SECRET ='mon-token-secret' \
     DB_TYPE='mariadb' \
