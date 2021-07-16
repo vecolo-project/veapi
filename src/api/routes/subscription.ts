@@ -28,7 +28,7 @@ route.post(
   async (req, res, next) => {
     const service = Container.get(defaultService);
     try {
-      const entityResult = await service.create(req.body);
+      const entityResult = await service.createS(req.body, req.body.user);
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
@@ -185,7 +185,7 @@ route.post(
     const service = Container.get(defaultService);
     try {
       req.body.user = req.currentUser.id;
-      const entityResult = await service.create(req.body);
+      const entityResult = await service.createS(req.body, req.currentUser);
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
