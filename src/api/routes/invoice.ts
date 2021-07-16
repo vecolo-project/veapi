@@ -6,6 +6,7 @@ import { Container } from 'typedi';
 import BikeModelService from '../services/BikeModelService';
 import InvoiceService from '../services/InvoiceService';
 import { userRequest } from '../../types/userRequest';
+import * as fs from 'fs';
 
 const route = Router();
 const paramsRules = celebrate({
@@ -147,6 +148,30 @@ route.get(
       const entityResult = await service.findOne(id);
       if (entityResult.user.id != req.currentUser.id) return res.status(403);
       return res.status(200).json(entityResult);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.get(
+  '/export/:id',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+
+      const id = Number.parseInt(req.params.id, 10);
+      const doc = await service.generateInvoicePDF(id, req.currentUser);
+      res.setHeader(
+        'Content-disposition',
+        'attachment; filename="invoice.pdf""'
+      );
+      res.setHeader('Content-type', 'application/pdf');
+      doc.pipe(res);
+      doc.end();
+      // return res.status(200).end();
     } catch (e) {
       return next(e);
     }

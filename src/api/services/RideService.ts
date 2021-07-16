@@ -170,7 +170,7 @@ export default class RideService extends CRUD<Ride> {
   ): Promise<Ride> {
     ride = await this.getRepo().findOne({
       where: { id: ride.id, user: { id: user.id } },
-      relations: ['startStation', 'endStation'],
+      relations: ['startStation', 'endStation', 'bike'],
     });
     if (!ride) {
       throw new ErrorHandler(404, 'Erreur avec la course !');
@@ -210,6 +210,8 @@ export default class RideService extends CRUD<Ride> {
       subscription: userSubscription,
     };
     await this.invoiceService.create(invoice);
+    ride.bike.station = endStation;
+    await this.bikeService.update(ride.bike.id, ride.bike);
     return ride;
   }
 

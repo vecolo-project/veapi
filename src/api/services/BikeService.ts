@@ -3,7 +3,10 @@ import { Bike, BikeRepository, BikeStatus } from '../entities/Bike';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
-import { Like, MoreThan } from 'typeorm';
+import { Like, MoreThan, ObjectLiteral } from 'typeorm';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
+import { validate } from 'class-validator';
+import _ from "lodash";
 
 @Service()
 export default class BikeService extends CRUD<Bike> {
@@ -47,6 +50,7 @@ export default class BikeService extends CRUD<Bike> {
       relations: ['model', 'model.bikeManufacturer', 'station'],
     });
   }
+
   async search(
     params: getAllParams,
     searchQuery?: any
@@ -94,5 +98,27 @@ export default class BikeService extends CRUD<Bike> {
       .skip(params.offset)
       .take(params.limit)
       .getManyAndCount();
+  }
+
+  async update(id: number, updatedFields: ObjectLiteral): Promise<Bike> {
+    const entity = await this.repo.findOne(id, {
+      relations: ['model', 'station'],
+    });
+    if (!entity) {
+      throw new ErrorHandler(404, 'Not found');
+    }
+    Object.keys(updatedFields).forEach((key) => {
+      if (updatedFields[key] !== undefined && _.has(entity, key)) {
+        entity[key] = updatedFields[key];
+      }
+    });
+    const errors = await validate(entity, {
+      validationError: { target: false },
+    });
+    if (errors.length > 0) throw errors;
+    if (_.has(entity, 'updatedAt')) {
+      entity['updatedAt'] = new Date();
+    }
+    return await this.repo.save(entity);
   }
 }
