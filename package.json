@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=production node dist/app.js",
     "build": "tsc -p .",
     "dev": "nodemon -V --exec ts-node src/app.ts",
-    "build&dev": "tsc -p . && node dist/app.js",
+    "build-dev": "tsc -p . && node dist/app.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "cross-env NODE_ENV=test TS_NODE=true jest --runInBand",
