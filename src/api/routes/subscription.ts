@@ -50,7 +50,7 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
 });
 
 route.delete(
-  '/' + ':id',
+  '/:id',
   isAuth,
   checkRole(Role.ADMIN),
   async (req, res, next) => {
@@ -158,7 +158,7 @@ route.get(
   }
 );
 
-route.get('/' + 'me/:id', isAuth, attachUser, async (req, res, next) => {
+route.get('/me/:id', isAuth, attachUser, async (req, res, next) => {
   try {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
@@ -170,22 +170,20 @@ route.get('/' + 'me/:id', isAuth, attachUser, async (req, res, next) => {
 });
 
 route.post(
-  '/' + 'add/',
+  '/add/',
   isAuth,
   attachUser,
   celebrate({
     body: Joi.object({
-      startDate: Joi.date().required(),
-      monthDuration: Joi.number().min(1).required(),
       autoRenew: Joi.boolean().required(),
-      plan: Joi.number().min(0).required(),
+      plan: Joi.object().required(),
     }),
   }),
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     try {
-      req.body.user = req.currentUser.id;
-      const entityResult = await service.createS(req.body, req.currentUser);
+      const sub: any = {plan: req.body.plan, autoRenew: req.body.autoRenew, user: req.currentUser.id, monthDuration: 3, startDate: new Date()};
+      const entityResult = await service.createS(sub, req.currentUser);
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
@@ -193,25 +191,21 @@ route.post(
   }
 );
 
-route.patch(
-  '/' + 'cancel/:id',
+route.delete(
+  '/cancel/:id',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
     try {
-      const previous = await service.findOne(id);
+      const previous = await service.getOneWithRelation(id);
       if (previous.user.id != req.currentUser.id) {
-        res.status(401);
+        res.status(401).end();
         return;
       }
       previous.autoRenew = false;
-      previous.monthDuration =
-        (Date.prototype.getFullYear() - previous.createdAt.getFullYear()) * 12 -
-        Date.prototype.getMonth() +
-        previous.createdAt.getMonth() +
-        1;
+      previous.monthDuration = previous.monthDuration + 1;
       const entityResult = await service.update(id, previous);
       return res.status(201).json(entityResult);
     } catch (e) {

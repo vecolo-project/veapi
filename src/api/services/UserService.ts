@@ -16,6 +16,7 @@ import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { Like } from 'typeorm';
 import SubscriptionService from './SubscriptionService';
 import { Subscription } from '../entities/Subscription';
+import { randomBytes } from 'crypto';
 
 @Service()
 export default class UserService extends CRUD<User> {
@@ -169,5 +170,20 @@ export default class UserService extends CRUD<User> {
 
   async findOneWithPassword(id: number): Promise<User | undefined> {
     return await this.repo.findOne(id);
+  }
+  async findOneByResetToken(
+    resetPasswordToken: string
+  ): Promise<User | undefined> {
+    return await this.repo.findOne({ where: { resetPasswordToken } });
+  }
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    return await this.repo.findOne({ where: { email } });
+  }
+
+  async generatePasswordToken(user: User): Promise<string> {
+    const token = await bcrypt.hash(randomBytes(20).toString(), 10);
+    await this.getRepo().update(user.id, { resetPasswordToken: token });
+    return 'https://vecolo.fr/auth/reset-password?token=' + token;
   }
 }

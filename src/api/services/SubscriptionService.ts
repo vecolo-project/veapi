@@ -51,9 +51,9 @@ export default class SubscriptionService extends CRUD<Subscription> {
     });
   }
 
-  async findLastFromUser(id: number): Promise<Subscription> {
+  async findLastFromUser(userId: number): Promise<Subscription> {
     const subscription = await this.repo.findOne({
-      where: { id },
+      where: { user: { id: userId } },
       relations: ['plan'],
       order: { createdAt: 'DESC' },
     });

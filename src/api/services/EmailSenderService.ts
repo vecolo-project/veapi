@@ -7,6 +7,7 @@ import { User } from '../entities/User';
 const templates = {
   simple_mail: 'd-e22c21577502499fae3e3d03591bacf8',
   contact_form: 'd-9364b3c533bb400180465bfca372e549',
+  reset_password: 'd-f709df7206ab483a97f9e3bc83302a0d',
 };
 
 @Service()
@@ -80,6 +81,31 @@ export default class EmailSenderService {
         email,
         phone,
         enterprise,
+      },
+    };
+    return sgMail.send(mail);
+  }
+
+  public async sendResetPassword(
+    firstname: string,
+    lastname: string,
+    email: string,
+    reset_link: string
+  ): Promise<any> {
+    const mail = {
+      to: email,
+      from: {
+        email: this.fromAdress,
+        name: 'Vécolo contact',
+      },
+      subject: 'Réinitialiser mon mot de passe',
+      templateId: templates.reset_password,
+
+      dynamic_template_data: {
+        subject: 'Réinitialiser mon mot de passe',
+        firstname,
+        lastname,
+        reset_link,
       },
     };
     return sgMail.send(mail);
