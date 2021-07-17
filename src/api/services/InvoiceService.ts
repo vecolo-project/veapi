@@ -90,7 +90,6 @@ export default class InvoiceService extends CRUD<Invoice> {
   }
 
   private static generatePDFHeader(doc: PDFKit.PDFDocument) {
-    console.log(__dirname);
     doc
       .image('./media/vecolo.png', 50, 30, { height: 60 })
       .fillColor('#212121')

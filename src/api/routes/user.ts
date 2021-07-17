@@ -227,7 +227,6 @@ route.patch(
     const service = Container.get(defaultService);
     try {
       const currentUser = await service.findOneWithPassword(req.currentUser.id);
-      console.log(currentUser);
       const passwordMatch = await bcrypt.compare(
         req.body.actualPassword,
         currentUser.password

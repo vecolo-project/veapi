@@ -13,6 +13,7 @@ COPY package*.json ormconfig.js ./
 RUN npm ci --production
 
 VOLUME /usr/app/upload
+VOLUME /usr/app/logs
 
 COPY --from=builder /usr/app/dist ./dist
 COPY ./media ./media

@@ -3,7 +3,9 @@
 .env*
 .gitignore
 dist
+logs
 test
+.github
 node_modules
 Procfile
 README.md
