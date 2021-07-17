@@ -29,30 +29,37 @@ export default class SchedulerService {
     const end1MonthAgo = endOfDay(subDays(now, 30));
     const start1MonthAgo = startOfDay(end1MonthAgo);
 
-    await this.stationMonitoringService
+    const result2Days = await this.stationMonitoringService
       .getRepo()
       .createQueryBuilder('stationMonitoring')
+      .where(`station_monitoring.createdAt >= '${start2DayAgo.toISOString()}'`)
+      .andWhere('station_monitoring.id mod 6 != 0')
       .delete()
-      .where(`stationMonitoring.createdAt >= '${start2DayAgo.toISOString()}'`)
-      .andWhere('stationMonitoring.id mod 6 != 0');
+      .execute();
 
-    await this.stationMonitoringService
+    console.log(`Deleted ${result2Days.affected} lines past 2 days`);
+
+    const result7Days = await this.stationMonitoringService
       .getRepo()
       .createQueryBuilder('stationMonitoring')
       .delete()
       .where(
-        `stationMonitoring.createdAt BETWEEN '${start7DayAgo.toISOString()}' AND '${start2DayAgo.toISOString()}'`
+        `station_monitoring.createdAt BETWEEN '${start7DayAgo.toISOString()}' AND '${start2DayAgo.toISOString()}'`
       )
-      .andWhere('stationMonitoring.id mod 60 != 0');
+      .andWhere('station_monitoring.id mod 60 != 0')
+      .execute();
+    console.log(`Deleted ${result7Days.affected} lines past 7 days`);
 
-    await this.stationMonitoringService
+    const result1Month = await this.stationMonitoringService
       .getRepo()
       .createQueryBuilder('stationMonitoring')
       .delete()
       .where(
-        `stationMonitoring.createdAt BETWEEN '${start7DayAgo.toISOString()}' AND '${start1MonthAgo.toISOString()}'`
+        `station_monitoring.createdAt BETWEEN '${start7DayAgo.toISOString()}' AND '${start1MonthAgo.toISOString()}'`
       )
-      .andWhere('stationMonitoring.id mod 180 != 0');
+      .andWhere('station_monitoring.id mod 180 != 0')
+      .execute();
+    console.log(`Deleted ${result1Month.affected} lines past 30 days`);
 
     await this.stationMonitoringService
       .getRepo()
