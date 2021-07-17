@@ -5,6 +5,7 @@ import UserService from './UserService';
 import InvoiceService from './InvoiceService';
 import SubscriptionService from './SubscriptionService';
 import { Subscription } from '../entities/Subscription';
+import Logger from '../../logger';
 
 @Service()
 export default class SchedulerService {
@@ -37,7 +38,7 @@ export default class SchedulerService {
       .delete()
       .execute();
 
-    console.log(`Deleted ${result2Days.affected} lines past 2 days`);
+    Logger.info(`Deleted ${result2Days.affected} lines past 2 days`);
 
     const result7Days = await this.stationMonitoringService
       .getRepo()
@@ -48,7 +49,7 @@ export default class SchedulerService {
       )
       .andWhere('station_monitoring.id mod 60 != 0')
       .execute();
-    console.log(`Deleted ${result7Days.affected} lines past 7 days`);
+    Logger.info(`Deleted ${result7Days.affected} lines past 7 days`);
 
     const result1Month = await this.stationMonitoringService
       .getRepo()
@@ -59,7 +60,7 @@ export default class SchedulerService {
       )
       .andWhere('station_monitoring.id mod 180 != 0')
       .execute();
-    console.log(`Deleted ${result1Month.affected} lines past 30 days`);
+    Logger.info(`Deleted ${result1Month.affected} lines past 30 days`);
 
     await this.stationMonitoringService
       .getRepo()
