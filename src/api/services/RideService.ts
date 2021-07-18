@@ -92,10 +92,10 @@ export default class RideService extends CRUD<Ride> {
     searchQuery?: any
   ): Promise<[Ride[], number]> {
     /*    return await this.rideRepo.findAndCount({
-          skip: param.offset,
-          take: param.limit,
-          relations: ['user', 'bike', 'startStation', 'endStation'],
-        });*/
+              skip: param.offset,
+              take: param.limit,
+              relations: ['user', 'bike', 'startStation', 'endStation'],
+            });*/
 
     const result = await this.rideRepo
       .createQueryBuilder('ride')
@@ -130,7 +130,8 @@ export default class RideService extends CRUD<Ride> {
   async startRide(
     bike: Bike,
     startStation: Station,
-    user: User
+    user: User,
+    createdAt = new Date()
   ): Promise<Ride> {
     bike = await this.bikeService.findWithStationAndModel(bike.id);
     const userSubscription = await this.subscriptionService.findLastFromUser(
@@ -149,6 +150,7 @@ export default class RideService extends CRUD<Ride> {
       bike,
       user,
       startStation,
+      createdAt,
     };
     return await this.create(ride);
   }
@@ -166,7 +168,8 @@ export default class RideService extends CRUD<Ride> {
     user: User,
     ride: Ride,
     endStation: Station,
-    length: number
+    length: number,
+    updatedAt = new Date()
   ): Promise<Ride> {
     ride = await this.getRepo().findOne({
       where: { id: ride.id, user: { id: user.id } },
@@ -175,6 +178,7 @@ export default class RideService extends CRUD<Ride> {
     if (!ride) {
       throw new ErrorHandler(404, 'Erreur avec la course !');
     }
+    const bike = ride.bike;
     const userSubscription: Subscription =
       await this.subscriptionService.findLastFromUser(user.id);
     if (!userSubscription) {
@@ -189,10 +193,7 @@ export default class RideService extends CRUD<Ride> {
       throw new ErrorHandler(403, 'La station ne peut plus accueillir de vélo');
     }
     const plan: Plan = userSubscription.plan;
-    const minutes = differenceInMinutes(
-      new Date(),
-      addHours(ride.createdAt, 2)
-    );
+    const minutes = differenceInMinutes(updatedAt, ride.createdAt);
     const invoiceAmount =
       Math.max(0, minutes - plan.freeMinutes) * plan.costPerMinute;
 
@@ -201,7 +202,7 @@ export default class RideService extends CRUD<Ride> {
     ride.endStation = endStation;
     ride.invoiceAmount = invoiceAmount;
 
-    ride = await this.update(ride.id, ride);
+    ride = await this.update(ride.id, ride, updatedAt);
 
     const invoice: any = {
       billingDate: new Date(),
@@ -210,12 +211,16 @@ export default class RideService extends CRUD<Ride> {
       subscription: userSubscription,
     };
     await this.invoiceService.create(invoice);
-    ride.bike.station = endStation;
-    await this.bikeService.update(ride.bike.id, ride.bike);
+    bike.station = endStation;
+    await this.bikeService.update(bike.id, bike);
     return ride;
   }
 
-  async update(id: number, updatedFields: ObjectLiteral): Promise<Ride> {
+  async update(
+    id: number,
+    updatedFields: ObjectLiteral,
+    updatedAt = new Date()
+  ): Promise<Ride> {
     const entity = await this.repo.findOne(id, {
       relations: ['startStation', 'endStation'],
     });
@@ -230,9 +235,11 @@ export default class RideService extends CRUD<Ride> {
     const errors = await validate(entity, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
     if (_.has(entity, 'updatedAt')) {
-      entity['updatedAt'] = new Date();
+      entity['updatedAt'] = updatedAt;
     }
     return await this.repo.save(entity);
   }
