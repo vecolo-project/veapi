@@ -3,10 +3,10 @@ import { Container } from 'typedi';
 import { celebrate, Joi } from 'celebrate';
 import UserService from '../services/UserService';
 import { Logger } from 'winston';
-import { attachUser, isAuth } from '../middlewares';
 import { userRequest } from '../../types/userRequest';
 import bcrypt from 'bcrypt';
 import EmailSenderService from '../services/EmailSenderService';
+import { validateCaptcha } from '../../helpers/CaptchaValidation';
 
 const route = Router();
 
@@ -20,11 +20,16 @@ route.post(
       password: Joi.string().required(),
       birthDate: Joi.date().required(),
       pseudo: Joi.string().required(),
+      captcha: Joi.string().required(),
     }),
   }),
   async (req, res, next) => {
     const logger: Logger = Container.get('logger');
     logger.debug('Calling /register endpoint with body: %o', req.body);
+    if (!(await validateCaptcha(req.body.captcha))) {
+      res.status(403).end('Captcha invalide !');
+      return;
+    }
     try {
       const userServiceInstance = Container.get(UserService);
       const { user, token } = await userServiceInstance.register(req.body);
@@ -41,11 +46,16 @@ route.post(
     body: Joi.object({
       email: Joi.string().required(),
       password: Joi.string().required(),
+      captcha: Joi.string().required(),
     }),
   }),
   async (req, res, next) => {
     const logger: Logger = Container.get('logger');
     logger.debug('Calling /login endpoint with email: %s', req.body.email);
+    if (!(await validateCaptcha(req.body.captcha))) {
+      res.status(403).end('Captcha invalide !');
+      return;
+    }
     try {
       const userServiceInstance = Container.get(UserService);
       const { user, token } = await userServiceInstance.login(
