@@ -1,7 +1,18 @@
 import winston from 'winston';
 import config from '../config';
+import * as Transport from 'winston-transport';
 
-const transports = [];
+const transports: Transport[] = [
+  new winston.transports.File({
+    filename: 'logs/error.log',
+    level: 'error',
+    format: winston.format.json(),
+  }),
+  new winston.transports.File({
+    filename: 'logs/combined.log',
+    level: 'info',
+  }),
+];
 if (process.env.NODE_ENV !== 'development') {
   transports.push(new winston.transports.Console());
 } else {

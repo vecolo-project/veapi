@@ -28,7 +28,7 @@ route.post(
   async (req, res, next) => {
     const service = Container.get(defaultService);
     try {
-      const entityResult = await service.create(req.body);
+      const entityResult = await service.createS(req.body, req.body.user);
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
@@ -49,24 +49,8 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   }
 });
 
-route.get(
-  '/' + ':id',
-  isAuth,
-  checkRole(Role.STAFF),
-  async (req, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const id = Number.parseInt(req.params.id);
-      const entityResult = await service.getOneWithRelation(id);
-      return res.status(200).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
-  }
-);
-
 route.delete(
-  '/' + ':id',
+  '/:id',
   isAuth,
   checkRole(Role.ADMIN),
   async (req, res, next) => {
@@ -93,7 +77,7 @@ route.delete(
 );
 
 route.put(
-  '/' + ':id',
+  '/:id',
   isAuth,
   checkRole(Role.ADMIN),
   paramsRules,
@@ -109,56 +93,97 @@ route.put(
   }
 );
 
+route.get('/me', isAuth, attachUser, async (req: userRequest, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
+    const [subscriptions, count] = await service.getAllFromUser(
+      req.currentUser.id,
+      {
+        offset,
+        limit,
+      }
+    );
+    return res.status(200).json({ subscriptions, count });
+  } catch (e) {
+    return next(e);
+  }
+});
+
 route.get(
-  '/' + 'me/',
+  '/current',
   isAuth,
   attachUser,
+  async (req: userRequest, res, next) => {
+    try {
+      const service = Container.get(defaultService);
+      const subscription = await service.findLastFromUser(req.currentUser.id);
+      return res.status(200).json(subscription);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
+
+route.get('/:id', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.getOneWithRelation(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
+  }
+});
+
+route.get(
+  '/user/:id',
+  isAuth,
+  checkRole(Role.STAFF),
   async (req: userRequest, res, next) => {
     try {
       const service = Container.get(defaultService);
       const offset = Number(req.query.offset) || 0;
       const limit = Number(req.query.limit) || 20;
-      const result = await service.find({ offset, limit });
-      return res.status(200).json(result);
+      const userId = Number.parseInt(req.params.id, 10);
+      const [subscriptions, count] = await service.getAllFromUser(userId, {
+        offset,
+        limit,
+      });
+      return res.status(200).json({ subscriptions, count });
     } catch (e) {
       return next(e);
     }
   }
 );
 
-route.get(
-  '/' + 'me/:id',
-  isAuth,
-  checkRole(Role.STAFF),
-  async (req, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const id = Number.parseInt(req.params.id);
-      const entityResult = await service.findOne(id);
-      return res.status(200).json(entityResult);
-    } catch (e) {
-      return next(e);
-    }
+route.get('/me/:id', isAuth, attachUser, async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const id = Number.parseInt(req.params.id);
+    const entityResult = await service.findOne(id);
+    return res.status(200).json(entityResult);
+  } catch (e) {
+    return next(e);
   }
-);
+});
 
 route.post(
-  '/' + 'add/',
+  '/add/',
   isAuth,
   attachUser,
   celebrate({
     body: Joi.object({
-      startDate: Joi.date().required(),
-      monthDuration: Joi.number().min(1).required(),
       autoRenew: Joi.boolean().required(),
-      plan: Joi.number().min(0).required(),
+      plan: Joi.object().required(),
     }),
   }),
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     try {
-      req.body.user = req.currentUser.id;
-      const entityResult = await service.create(req.body);
+      const sub: any = {plan: req.body.plan, autoRenew: req.body.autoRenew, user: req.currentUser.id, monthDuration: 3, startDate: new Date()};
+      const entityResult = await service.createS(sub, req.currentUser);
       return res.status(201).json(entityResult);
     } catch (e) {
       return next(e);
@@ -166,25 +191,21 @@ route.post(
   }
 );
 
-route.patch(
-  '/' + 'cancel/:id',
+route.delete(
+  '/cancel/:id',
   isAuth,
   attachUser,
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
     try {
-      const previous = await service.findOne(id);
+      const previous = await service.getOneWithRelation(id);
       if (previous.user.id != req.currentUser.id) {
-        res.status(401);
+        res.status(401).end();
         return;
       }
       previous.autoRenew = false;
-      previous.monthDuration =
-        (Date.prototype.getFullYear() - previous.createdAt.getFullYear()) * 12 -
-        Date.prototype.getMonth() +
-        previous.createdAt.getMonth() +
-        1;
+      previous.monthDuration = previous.monthDuration + 1;
       const entityResult = await service.update(id, previous);
       return res.status(201).json(entityResult);
     } catch (e) {

@@ -15,7 +15,12 @@ export interface Config {
   dbType: string;
   logs: { level: string };
   endpointPrefix: string;
+  sendGridApiKey: string;
+  sendgridFromEmail: string;
+  sendgridReplyEmail: string;
+  recaptchaKey: string;
 }
+
 let config: Config;
 
 if (process.env.NODE_ENV === 'test') {
@@ -32,6 +37,10 @@ if (process.env.NODE_ENV === 'test') {
       level: 'debug',
     },
     endpointPrefix: '',
+    sendGridApiKey: '',
+    sendgridFromEmail: '',
+    sendgridReplyEmail: '',
+    recaptchaKey: '',
   };
 } else {
   config = {
@@ -47,6 +56,10 @@ if (process.env.NODE_ENV === 'test') {
       level: process.env.LOG_LEVEL,
     },
     endpointPrefix: process.env.ENDPOINT_PREFIX || '',
+    sendGridApiKey: process.env.SENDGRID_API_KEY,
+    sendgridFromEmail: process.env.SENDGRID_SEND_EMAIL,
+    sendgridReplyEmail: process.env.SENDGRID_REPLY_EMAIL,
+    recaptchaKey: process.env.RECAPTCHA_KEY,
   };
 }
 

@@ -69,7 +69,7 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
     dateStart: Date,
     dateEnd: Date
   ): Promise<StationMonitoring[]> {
-    return this.repo.find({
+    return await this.repo.find({
       where: {
         createdAt: Between(dateStart, dateEnd),
         station: { id: stationId },
@@ -78,5 +78,15 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
         createdAt: 'ASC',
       },
     });
+
+    /*return await this.repo
+      .createQueryBuilder('stationMonitoring')
+      .where(
+        `stationMonitoring.createdAt BETWEEN '${dateStart.toISOString()}' AND '${dateEnd.toISOString()}'`
+      )
+      .andWhere(`stationMonitoring.stationId = ${stationId}`)
+      .andWhere('stationMonitoring.id mod 500 = 0')
+      .orderBy('stationMonitoring.createdAt', 'ASC')
+      .getMany();*/
   }
 }

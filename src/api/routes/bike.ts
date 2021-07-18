@@ -45,8 +45,10 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const entityResult = await service.find({ offset, limit });
-    return res.status(200).json(entityResult);
+    const searchQuery = req.query.searchQuery || '';
+
+    const [bikes, count] = await service.search({ offset, limit }, searchQuery);
+    return res.status(200).json({ bikes, count });
   } catch (e) {
     return next(e);
   }
@@ -104,7 +106,10 @@ route.delete(
       );
       const id = Number.parseInt(req.params.id);
       const thread = await serviceBikeMaintenance.getAllFromBike(id);
-      const rides = await serviceRide.getAllRideFromBike(id);
+      const [rides, count] = await serviceRide.getAllRideFromBike(id, {
+        limit: 9999999,
+        offset: 0,
+      });
       if (thread.length != 0 || rides.length != 0)
         return res
           .status(403)

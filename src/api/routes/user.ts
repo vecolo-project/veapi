@@ -7,6 +7,7 @@ import { userRequest } from '../../types/userRequest';
 import { Role } from '../entities/User';
 import { celebrate, Joi } from 'celebrate';
 import bcrypt from 'bcrypt';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 const route = Router();
 const paramsRules = celebrate({
@@ -47,11 +48,46 @@ route.get(
   }
 );
 
-route.get('/current', isAuth, attachUser, (req: userRequest, res: Response) => {
-  const logger: Logger = Container.get('logger');
-  logger.debug('Calling GET /user/current endpoint');
-  return res.json({ user: req.currentUser }).status(200);
-});
+route.get(
+  '/current',
+  isAuth,
+  attachUser,
+  async (req: userRequest, res: Response) => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling GET /user/current endpoint');
+
+    const service = Container.get(defaultService);
+    const entityResult = await service.findOne(req.currentUser.id);
+
+    return res.json({ user: entityResult }).status(200);
+  }
+);
+
+route.put(
+  '/current',
+  isAuth,
+  attachUser,
+  celebrate({
+    body: Joi.object({
+      firstName: Joi.string().min(1).required(),
+      lastName: Joi.string().min(1).required(),
+      pseudo: Joi.string().min(4).required(),
+      email: Joi.string().email(),
+      role: Joi.forbidden(),
+      password: Joi.forbidden(),
+      birthDate: Joi.forbidden(),
+    }),
+  }),
+  async (req: userRequest, res: Response, next: NextFunction) => {
+    try {
+      const service = Container.get(defaultService);
+      const user = await service.update(req.currentUser.id, req.body);
+      res.json(user);
+    } catch (e) {
+      return next(e);
+    }
+  }
+);
 
 route.post(
   '/',
@@ -73,7 +109,7 @@ route.post(
 route.get(
   '/' + ':id',
   isAuth,
-  checkRole(Role.ADMIN),
+  checkRole(Role.STAFF),
   async (req, res, next) => {
     try {
       const service = Container.get(defaultService);
@@ -96,7 +132,7 @@ route.delete(
       const id = Number.parseInt(req.params.id);
       //TODO delete dependency
       await service.delete(id);
-      return res.status(204);
+      return res.status(204).end();
     } catch (e) {
       return next(e);
     }
@@ -115,7 +151,7 @@ route.put(
       isActive: Joi.boolean().required(),
       password: Joi.string().min(7),
       email: Joi.string().email().required(),
-      pseudo: Joi.string().min(7).required(),
+      pseudo: Joi.string().min(4).required(),
       newsletter: Joi.boolean().required(),
       role: Joi.string()
         .allow('ADMIN', 'CLIENT', 'STAFF', 'STATION')
@@ -126,10 +162,9 @@ route.put(
     const service = Container.get(defaultService);
     const id = Number.parseInt(req.params.id);
     try {
-      const previous = await service.findOne(id);
-      //todo
-      if (req.body.password != undefined)
+      if (req.body.password != undefined) {
         req.body.password = await bcrypt.hash(req.body.password, 12);
+      }
       await service.update(id, req.body);
       const userUpdated = await service.findOne(id);
       return res.status(201).json(userUpdated);
@@ -149,7 +184,7 @@ route.patch(
       lastName: Joi.string().min(1),
       birthDate: Joi.date().max('now'),
       email: Joi.string().email(),
-      pseudo: Joi.string().min(7),
+      pseudo: Joi.string().min(4),
       newsletter: Joi.boolean(),
     }),
   }),
@@ -180,18 +215,28 @@ route.patch(
   attachUser,
   celebrate({
     body: Joi.object({
-      password: Joi.string().min(7).required(),
+      actualPassword: Joi.string().required(),
+      newPassword: Joi.string().min(4).required(),
+      confirmNewPassword: Joi.string()
+        .min(4)
+        .required()
+        .valid(Joi.ref('newPassword')),
     }),
   }),
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     try {
-      req.currentUser.password = await bcrypt.hash(req.body.password, 12);
-      const entityResult = await service.update(
-        req.currentUser.id,
-        req.currentUser
+      const currentUser = await service.findOneWithPassword(req.currentUser.id);
+      const passwordMatch = await bcrypt.compare(
+        req.body.actualPassword,
+        currentUser.password
       );
-      return res.status(201).json(entityResult);
+      if (!passwordMatch) {
+        throw new ErrorHandler(400, `le mot de passe actuel n'est pas correct`);
+      }
+      currentUser.password = await bcrypt.hash(req.body.newPassword, 12);
+      await service.update(currentUser.id, currentUser);
+      return res.status(200).end();
     } catch (e) {
       return next(e);
     }

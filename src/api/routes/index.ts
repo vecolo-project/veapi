@@ -15,6 +15,8 @@ import stationMaintenance from './stationMaintenanceThread';
 import subscription from './subscription';
 import bikeManufacturer from './bikeManufacturer';
 import bikeModel from './bikeModel';
+import email from './email';
+import statistics from './statistics';
 
 const routes = Router();
 
@@ -30,12 +32,14 @@ routes.use('/bike', bike);
 routes.use('/bike-manufacturer', bikeManufacturer);
 routes.use('/bike-model', bikeModel);
 routes.use('bikeMaintenance', bikeMaintenance);
-routes.use('invoice', invoice);
+routes.use('/invoice', invoice);
 routes.use('issue', issue);
 routes.use('issueThread', issueThread);
 routes.use('/plan', plan);
 routes.use('/ride', ride);
 routes.use('stationMaintenance', stationMaintenance);
 routes.use('/subscription', subscription);
+routes.use('/email', email);
+routes.use('/statistics', statistics);
 
 export default routes;

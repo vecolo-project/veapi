@@ -69,8 +69,11 @@ route.get('/', async (req, res, next) => {
     const service = Container.get(defaultService);
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 20;
-    const stations = await service.findAll({ offset, limit });
-    const count = await service.getRepo().count();
+    const searchQuery = req.query.searchQuery || '';
+    const { stations, count } = await service.search(
+      { offset, limit },
+      searchQuery
+    );
     return res.status(200).json({ stations, count });
   } catch (e) {
     return next(e);

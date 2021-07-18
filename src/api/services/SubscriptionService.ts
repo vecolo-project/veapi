@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
@@ -6,9 +6,14 @@ import { Subscription, SubscriptionRepository } from '../entities/Subscription';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { validate } from 'class-validator';
 import _ from 'lodash';
+import { addMonths } from 'date-fns';
+import InvoiceService from './InvoiceService';
+import { User } from '../entities/User';
 
 @Service()
 export default class SubscriptionService extends CRUD<Subscription> {
+  invoiceService: InvoiceService;
+
   constructor(
     @InjectRepository(Subscription)
     protected subscriptionRepo: SubscriptionRepository,
@@ -16,6 +21,7 @@ export default class SubscriptionService extends CRUD<Subscription> {
     protected logger: Logger
   ) {
     super(subscriptionRepo, logger);
+    this.invoiceService = Container.get(InvoiceService);
   }
 
   async getAllFromPlan(
@@ -29,6 +35,36 @@ export default class SubscriptionService extends CRUD<Subscription> {
       skip: params.offset,
       take: params.limit,
     });
+  }
+
+  async getAllFromUser(
+    id: number,
+    params: getAllParams
+  ): Promise<[Subscription[], number]> {
+    return this.repo.findAndCount({
+      where: {
+        user: { id },
+      },
+      relations: ['plan'],
+      skip: params.offset,
+      take: params.limit,
+    });
+  }
+
+  async findLastFromUser(userId: number): Promise<Subscription> {
+    const subscription = await this.repo.findOne({
+      where: { user: { id: userId } },
+      relations: ['plan'],
+      order: { createdAt: 'DESC' },
+    });
+    if (
+      subscription &&
+      addMonths(new Date(subscription.startDate), subscription.monthDuration) >=
+        new Date()
+    ) {
+      return subscription;
+    }
+    return undefined;
   }
 
   async getAllWithRelation(params: getAllParams): Promise<Subscription[]> {
@@ -64,10 +100,23 @@ export default class SubscriptionService extends CRUD<Subscription> {
     const errors = await validate(entity, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
     if (_.has(entity, 'updatedAt')) {
       entity['updatedAt'] = new Date();
     }
     return await this.repo.save(entity);
+  }
+
+  async createS(subscription: Subscription, user: User): Promise<Subscription> {
+    const invoice: any = {
+      billingDate: new Date(),
+      amount: subscription.plan?.price,
+      user: user,
+      subscription: subscription,
+    };
+    await this.invoiceService.create(invoice);
+    return await this.create(subscription);
   }
 }

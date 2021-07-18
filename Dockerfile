@@ -12,7 +12,11 @@ WORKDIR /usr/app
 COPY package*.json ormconfig.js ./
 RUN npm ci --production
 
+VOLUME /usr/app/upload
+VOLUME /usr/app/logs
+
 COPY --from=builder /usr/app/dist ./dist
+COPY ./media ./media
 
 ENV JWT_SECRET ='mon-token-secret' \
     DB_TYPE='mariadb' \
@@ -24,7 +28,12 @@ ENV JWT_SECRET ='mon-token-secret' \
     PORT=3000 \
     LOG_LEVEL='debug' \
     ENDPOINT_PREFIX='' \
-    NODE_ENV='production'
+    NODE_ENV='production'\
+    SENDGRID_API_KEY=''\
+    SENDGRID_SEND_EMAIL=''\
+    SENDGRID_REPLY_EMAIL=''\
+    RECAPTCHA_KEY=''
+
 
 EXPOSE 3000
 CMD node dist/app.js

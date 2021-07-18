@@ -3,7 +3,10 @@ import { Bike, BikeRepository, BikeStatus } from '../entities/Bike';
 import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
-import { MoreThan } from 'typeorm';
+import { Like, MoreThan, ObjectLiteral } from 'typeorm';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
+import { validate } from 'class-validator';
+import _ from "lodash";
 
 @Service()
 export default class BikeService extends CRUD<Bike> {
@@ -44,7 +47,80 @@ export default class BikeService extends CRUD<Bike> {
   async findWithStationAndModel(id: number): Promise<Bike> {
     return this.repo.findOne({
       where: { id },
+      relations: ['model', 'model.bikeManufacturer', 'station'],
+    });
+  }
+
+  async search(
+    params: getAllParams,
+    searchQuery?: any
+  ): Promise<[Bike[], number]> {
+    /*
+    let bikes: Bike[];
+    let count: number;
+    if (searchQuery) {
+      bikes = await this.repo.find({
+        relations: ['model', 'model.bikeManufacturer'],
+        where: [
+          { matriculate: Like(`%${searchQuery}%`) },
+          { batteryPercent: Like(`%${searchQuery}%`) },
+          { status: Like(`%${searchQuery}%`) },
+        ],
+        take: params.limit,
+        skip: params.offset,
+      });
+      count = await this.repo.count({
+        where: [
+          { matriculate: Like(`%${searchQuery}%`) },
+          { batteryPercent: Like(`%${searchQuery}%`) },
+          { status: Like(`%${searchQuery}%`) },
+        ],
+      });
+    } else {
+      bikes = await this.repo.find({
+        relations: ['model', 'model.bikeManufacturer'],
+        take: params.limit,
+        skip: params.offset,
+      });
+      count = await this.repo.count();
+    }
+    return { bikes, count };
+*/
+    return this.bikeRepo
+      .createQueryBuilder('bike')
+      .leftJoinAndSelect('bike.model', 'model')
+      .leftJoinAndSelect('bike.station', 'station')
+      .leftJoinAndSelect('model.bikeManufacturer', 'manufacturer')
+      .where(`bike.matriculate LIKE ('%${searchQuery}%')`)
+      .orWhere(`bike.batteryPercent LIKE ('%${searchQuery}%')`)
+      .orWhere(`bike.status LIKE ('%${searchQuery}%')`)
+      .orWhere(`model.name LIKE ('%${searchQuery}%')`)
+      .orWhere(`manufacturer.name LIKE ('%${searchQuery}%')`)
+      .orWhere(`station.streetName LIKE ('%${searchQuery}%')`)
+      .skip(params.offset)
+      .take(params.limit)
+      .getManyAndCount();
+  }
+
+  async update(id: number, updatedFields: ObjectLiteral): Promise<Bike> {
+    const entity = await this.repo.findOne(id, {
       relations: ['model', 'station'],
     });
+    if (!entity) {
+      throw new ErrorHandler(404, 'Not found');
+    }
+    Object.keys(updatedFields).forEach((key) => {
+      if (updatedFields[key] !== undefined && _.has(entity, key)) {
+        entity[key] = updatedFields[key];
+      }
+    });
+    const errors = await validate(entity, {
+      validationError: { target: false },
+    });
+    if (errors.length > 0) throw errors;
+    if (_.has(entity, 'updatedAt')) {
+      entity['updatedAt'] = new Date();
+    }
+    return await this.repo.save(entity);
   }
 }

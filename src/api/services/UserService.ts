@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import {
   User,
   UserCreationProps,
@@ -14,9 +14,13 @@ import { validate } from 'class-validator';
 import CRUD, { getAllParams } from './CRUD';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
 import { Like } from 'typeorm';
+import SubscriptionService from './SubscriptionService';
+import { Subscription } from '../entities/Subscription';
+import { randomBytes } from 'crypto';
 
 @Service()
 export default class UserService extends CRUD<User> {
+  private subscriptionService: SubscriptionService;
   constructor(
     @InjectRepository(User)
     protected userRepo: UserRepository,
@@ -24,6 +28,7 @@ export default class UserService extends CRUD<User> {
     protected logger: Logger
   ) {
     super(userRepo, logger);
+    this.subscriptionService = Container.get(SubscriptionService);
   }
 
   getRepo(): UserRepository {
@@ -44,14 +49,19 @@ export default class UserService extends CRUD<User> {
     const errors = await validate(newUser, {
       validationError: { target: false },
     });
-    if (errors.length > 0) throw errors;
+    if (errors.length > 0) {
+      throw errors;
+    }
 
     const foundUser = await this.userRepo.findOne({ email: newUser.email });
-    if (foundUser)
+    if (foundUser) {
       throw new ErrorHandler(400, 'The email address already exists');
+    }
 
     const userRecord: User = await this.userRepo.save(newUser);
-    if (!userRecord) throw new ErrorHandler(500, 'User cannot be created');
+    if (!userRecord) {
+      throw new ErrorHandler(500, 'User cannot be created');
+    }
 
     const token = this.generateToken(userRecord);
     const user = userRecord;
@@ -62,13 +72,24 @@ export default class UserService extends CRUD<User> {
   async login(email: string, password: string): Promise<UserResponse> {
     this.logger.debug('Authenticating user...');
     const userRecord = await this.userRepo.findOne({ email });
-    if (!userRecord) throw new ErrorHandler(401, 'Invalid email or password');
+    if (!userRecord) {
+      throw new ErrorHandler(401, 'Invalid email or password');
+    }
 
     const validPassword = await bcrypt.compare(password, userRecord.password);
 
     if (validPassword) {
       const token = this.generateToken(userRecord);
       const user = userRecord;
+
+      const subscription: Subscription =
+        await this.subscriptionService.findLastFromUser(user.id);
+      if (subscription) {
+        user.subscriptions = [subscription];
+      } else {
+        user.subscriptions = [];
+      }
+
       Reflect.deleteProperty(user, 'password');
       return { user, token };
     }
@@ -97,23 +118,19 @@ export default class UserService extends CRUD<User> {
     let users: User[];
     let count: number;
     if (searchQuery) {
+      const whereOption = [
+        { firstName: Like(`%${searchQuery}%`) },
+        { lastName: Like(`%${searchQuery}%`) },
+        { email: Like(`%${searchQuery}%`) },
+        { role: Like(`%${searchQuery}%`) },
+      ];
       users = await this.repo.find({
-        where: [
-          { firstName: Like(`%${searchQuery}%`) },
-          { lastName: Like(`%${searchQuery}%`) },
-          { email: Like(`%${searchQuery}%`) },
-          { role: Like(`%${searchQuery}%`) },
-        ],
+        where: whereOption,
         take: params.limit,
         skip: params.offset,
       });
       count = await this.repo.count({
-        where: [
-          { firstName: Like(`%${searchQuery}%`) },
-          { lastName: Like(`%${searchQuery}%`) },
-          { email: Like(`%${searchQuery}%`) },
-          { role: Like(`%${searchQuery}%`) },
-        ],
+        where: whereOption,
       });
     } else {
       users = await this.repo.find({
@@ -128,11 +145,45 @@ export default class UserService extends CRUD<User> {
     return { users, count };
   }
 
+  async newsletterUsers(): Promise<User[]> {
+    return await this.repo.find({
+      where: {
+        newsletter: true,
+      },
+    });
+  }
+
   async findOne(id: number): Promise<User | undefined> {
     const user = await this.repo.findOne(id);
     if (user) {
       Reflect.deleteProperty(user, 'password');
     }
+    const subscription: Subscription =
+      await this.subscriptionService.findLastFromUser(id);
+    if (subscription) {
+      user.subscriptions = [subscription];
+    } else {
+      user.subscriptions = [];
+    }
     return user;
+  }
+
+  async findOneWithPassword(id: number): Promise<User | undefined> {
+    return await this.repo.findOne(id);
+  }
+  async findOneByResetToken(
+    resetPasswordToken: string
+  ): Promise<User | undefined> {
+    return await this.repo.findOne({ where: { resetPasswordToken } });
+  }
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    return await this.repo.findOne({ where: { email } });
+  }
+
+  async generatePasswordToken(user: User): Promise<string> {
+    const token = await bcrypt.hash(randomBytes(20).toString(), 10);
+    await this.getRepo().update(user.id, { resetPasswordToken: token });
+    return 'https://vecolo.fr/auth/reset-password?token=' + token;
   }
 }
