@@ -4,6 +4,8 @@ import { checkRole, isAuth } from '../middlewares';
 import { Role } from '../entities/User';
 import { Container } from 'typedi';
 import EmailSenderService from '../services/EmailSenderService';
+import { validateCaptcha } from '../../helpers/CaptchaValidation';
+import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 const route = Router();
 const sendSimpleUserMailCheck = celebrate({
@@ -20,7 +22,8 @@ const sendContactFormMailCheck = celebrate({
     content: Joi.string().required(),
     email: Joi.string().required(),
     phone: Joi.string().required(),
-    enterprise: Joi.string().optional(),
+    enterprise: Joi.string().allow(null, '').optional(),
+    captcha: Joi.string().required(),
   }),
 });
 const sendNewsletterMailCheck = celebrate({
@@ -54,6 +57,10 @@ route.post(
 route.post('/contact', sendContactFormMailCheck, async (req, res, next) => {
   const service = Container.get(defaultService);
   try {
+    if (!(await validateCaptcha(req.body.captcha))) {
+      res.status(403).end('Captcha invalide !');
+      return;
+    }
     await service.sendContactForm(
       req.body.firstname,
       req.body.lastname,
