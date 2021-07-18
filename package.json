@@ -12,6 +12,8 @@
     "lint:fix": "eslint . --fix",
     "test": "cross-env NODE_ENV=test TS_NODE=true jest --runInBand",
     "seed-bike": "ts-node -T commands/seed_bike.ts",
+    "seed-bike-station": "ts-node -T commands/seed_bike_on_station.ts",
+    "seed-ride": "ts-node -T commands/seed_ride.ts",
     "semantic-release": "semantic-release",
     "generate-migration": "npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
     "generate-migration:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",

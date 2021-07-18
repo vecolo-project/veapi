@@ -6,7 +6,7 @@ import BikeService from '../src/api/services/BikeService';
 import {BikeModel} from '../src/api/entities/BikeModel';
 import {Bike, BikeStatus} from '../src/api/entities/Bike';
 
-const fillCount = 1700;
+const fillCount = 5;
 
 const run = async () => {
     Container.set('logger', Logger);
@@ -41,9 +41,9 @@ const run = async () => {
             batteryPercent: Math.floor(Math.random() * 100),
             station: null
         };
-        await bikeService.getRepo().save(bike);
+        const bikeDB = await bikeService.getRepo().save(bike);
+        log(`Bike ${bikeDB.id} inserted (${i + 1}/${fillCount})`);
     }
-
 };
 
 
