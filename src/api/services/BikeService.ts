@@ -89,12 +89,14 @@ export default class BikeService extends CRUD<Bike> {
     return this.bikeRepo
       .createQueryBuilder('bike')
       .leftJoinAndSelect('bike.model', 'model')
+      .leftJoinAndSelect('bike.station', 'station')
       .leftJoinAndSelect('model.bikeManufacturer', 'manufacturer')
       .where(`bike.matriculate LIKE ('%${searchQuery}%')`)
       .orWhere(`bike.batteryPercent LIKE ('%${searchQuery}%')`)
       .orWhere(`bike.status LIKE ('%${searchQuery}%')`)
       .orWhere(`model.name LIKE ('%${searchQuery}%')`)
       .orWhere(`manufacturer.name LIKE ('%${searchQuery}%')`)
+      .orWhere(`station.streetName LIKE ('%${searchQuery}%')`)
       .skip(params.offset)
       .take(params.limit)
       .getManyAndCount();
