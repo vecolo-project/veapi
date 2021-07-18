@@ -56,6 +56,11 @@ const run = async () => {
             .getOne();
 
         const availableBikes: Bike[] = await bikeService.getAllFromStation(startStation.id, {limit: 100, offset: 0});
+        if (availableBikes.length == 0) {
+            log('Start station don\'t have available bikes, skipping...');
+            i--;
+            continue;
+        }
 
         const ride: Ride = await rideService.startRide(
             availableBikes[Math.floor(Math.random() * 10000 % availableBikes.length)],
