@@ -5,7 +5,6 @@ import { Role } from '../entities/User';
 import { Container } from 'typedi';
 import EmailSenderService from '../services/EmailSenderService';
 import { validateCaptcha } from '../../helpers/CaptchaValidation';
-import { ErrorHandler } from '../../helpers/ErrorHandler';
 
 const route = Router();
 const sendSimpleUserMailCheck = celebrate({
