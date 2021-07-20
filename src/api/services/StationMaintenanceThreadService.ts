@@ -8,9 +8,7 @@ import {
 } from '../entities/StationMaintenanceThread';
 
 @Service()
-export default class StationMaintenanceThreadService extends CRUD<
-  StationMaintenanceThread
-> {
+export default class StationMaintenanceThreadService extends CRUD<StationMaintenanceThread> {
   constructor(
     @InjectRepository(StationMaintenanceThread)
     protected stationMaintenanceThreadRepo: StationMaintenanceThreadRepository,

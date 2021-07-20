@@ -49,32 +49,27 @@ route.get('/', isAuth, checkRole(Role.STAFF), async (req, res, next) => {
   }
 });
 
-route.delete(
-  '/:id',
-  isAuth,
-  checkRole(Role.ADMIN),
-  async (req, res, next) => {
-    try {
-      const service = Container.get(defaultService);
-      const dependencyService = Container.get(InvoiceService);
-      const id = Number.parseInt(req.params.id);
-      const dependency = await dependencyService.getAllFromSubscription(id, {
-        limit: 1,
-        offset: 0,
-      });
-      if (dependency.length > 0) {
-        res
-          .status(403)
-          .json({ message: 'Impossible de supprimer cette inscription' });
-        return;
-      }
-      await service.delete(id);
-      return res.status(204).end();
-    } catch (e) {
-      return next(e);
+route.delete('/:id', isAuth, checkRole(Role.ADMIN), async (req, res, next) => {
+  try {
+    const service = Container.get(defaultService);
+    const dependencyService = Container.get(InvoiceService);
+    const id = Number.parseInt(req.params.id);
+    const dependency = await dependencyService.getAllFromSubscription(id, {
+      limit: 1,
+      offset: 0,
+    });
+    if (dependency.length > 0) {
+      res
+        .status(403)
+        .json({ message: 'Impossible de supprimer cette inscription' });
+      return;
     }
+    await service.delete(id);
+    return res.status(204).end();
+  } catch (e) {
+    return next(e);
   }
-);
+});
 
 route.put(
   '/:id',
@@ -182,7 +177,13 @@ route.post(
   async (req: userRequest, res, next) => {
     const service = Container.get(defaultService);
     try {
-      const sub: any = {plan: req.body.plan, autoRenew: req.body.autoRenew, user: req.currentUser.id, monthDuration: 3, startDate: new Date()};
+      const sub: any = {
+        plan: req.body.plan,
+        autoRenew: req.body.autoRenew,
+        user: req.currentUser.id,
+        monthDuration: 3,
+        startDate: new Date(),
+      };
       const entityResult = await service.createS(sub, req.currentUser);
       return res.status(201).json(entityResult);
     } catch (e) {

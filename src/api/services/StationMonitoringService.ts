@@ -38,9 +38,8 @@ export default class StationMonitoringService extends CRUD<StationMonitoring> {
     stationId: number,
     stationMonitoringProps: StationMonitoringCreationProps
   ): Promise<StationMonitoring | undefined> {
-    const previousStationMonitoring:
-      | StationMonitoring
-      | undefined = await this.getLastStationMonitoring(stationId);
+    const previousStationMonitoring: StationMonitoring | undefined =
+      await this.getLastStationMonitoring(stationId);
 
     if (
       previousStationMonitoring &&

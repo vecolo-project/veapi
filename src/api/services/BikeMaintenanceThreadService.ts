@@ -8,9 +8,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 
 @Service()
-export default class BikeMaintenanceThreadService extends CRUD<
-  BikeMaintenanceThread
-> {
+export default class BikeMaintenanceThreadService extends CRUD<BikeMaintenanceThread> {
   constructor(
     @InjectRepository(BikeMaintenanceThread)
     protected bikeMaintenanceThreadRepo: BikeMaintenanceThreadRepository,

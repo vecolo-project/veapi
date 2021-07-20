@@ -51,9 +51,7 @@ export class StationMonitoring extends BaseEntity {
 
 @Service()
 @EntityRepository(StationMonitoring)
-export class StationMonitoringRepository extends Repository<
-  StationMonitoring
-> {}
+export class StationMonitoringRepository extends Repository<StationMonitoring> {}
 
 export interface StationMonitoringCreationProps {
   isActive: boolean;

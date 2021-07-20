@@ -31,9 +31,8 @@ export default class StationService extends CRUD<Station> {
   async findAll(param: getAllParams): Promise<Station[]> {
     const stations: Station[] = await this.find(param);
     for (const i in stations) {
-      const monitoring: StationMonitoring = await this.stationMonitoringService.findLast(
-        stations[i].id
-      );
+      const monitoring: StationMonitoring =
+        await this.stationMonitoringService.findLast(stations[i].id);
       if (monitoring) {
         stations[i].stationMonitoring = [monitoring];
       } else {
@@ -68,9 +67,8 @@ export default class StationService extends CRUD<Station> {
       });
     }
     for (const i in stations) {
-      const monitoring: StationMonitoring = await this.stationMonitoringService.findLast(
-        stations[i].id
-      );
+      const monitoring: StationMonitoring =
+        await this.stationMonitoringService.findLast(stations[i].id);
       if (monitoring) {
         stations[i].stationMonitoring = [monitoring];
       } else {
@@ -84,9 +82,8 @@ export default class StationService extends CRUD<Station> {
   async getOne(id: number): Promise<Station | undefined> {
     const station: Station = await this.findOne(id);
     if (station) {
-      const monitoring: StationMonitoring = await this.stationMonitoringService.findLast(
-        station.id
-      );
+      const monitoring: StationMonitoring =
+        await this.stationMonitoringService.findLast(station.id);
       if (monitoring) {
         station.stationMonitoring = [monitoring];
       } else {

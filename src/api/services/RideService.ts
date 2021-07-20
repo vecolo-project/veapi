@@ -9,8 +9,7 @@ import { User } from '../entities/User';
 import SubscriptionService from './SubscriptionService';
 import InvoiceService from './InvoiceService';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
-import { Plan } from '../entities/Plan';
-import { addHours, differenceInMinutes } from 'date-fns';
+import { differenceInMinutes } from 'date-fns';
 import { validate } from 'class-validator';
 import { Subscription } from '../entities/Subscription';
 import BikeService from './BikeService';
@@ -176,9 +175,8 @@ export default class RideService extends CRUD<Ride> {
     if (!ride) {
       throw new ErrorHandler(404, 'Erreur avec la course !');
     }
-    const userSubscription: Subscription = await this.subscriptionService.findLastFromUser(
-      user.id
-    );
+    const userSubscription: Subscription =
+      await this.subscriptionService.findLastFromUser(user.id);
     if (!userSubscription) {
       throw new ErrorHandler(403, "Vous ne possedez pas d'abonnement actif");
     }
