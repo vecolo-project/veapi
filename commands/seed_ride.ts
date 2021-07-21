@@ -35,7 +35,7 @@ const run = async () => {
         .select('id')
         .getRawMany();
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < rideCount; i++) {
         const user: User = await userService.findOne(userIds[Math.floor(Math.random() * 10000 % userIds.length)].id);
         if (user.subscriptions?.length == 0) {
             log(`User ${user.id} don't have subscription, skipping...`);
@@ -43,7 +43,7 @@ const run = async () => {
             continue;
         }
         const startDate = addDays(start, Math.floor(Math.random() * difference));
-        const rideDuration = Math.floor(Math.random() * 60);
+        const rideDuration = 1 + Math.floor(Math.random() * 60);
         const endDate = addMinutes(startDate, rideDuration);
 
         const startStation: Station = await stationService.findOne(stationIds[Math.floor(Math.random() * 10000 % stationIds.length)].id);
@@ -72,7 +72,7 @@ const run = async () => {
             user,
             ride,
             endStation,
-            Math.floor(20 * rideDuration * +Math.random() * 20),
+            Math.floor(rideDuration * Math.random() * 20),
             endDate
         );
         log(`Ride ${ride.id} inserted (${i + 1}/${rideCount})`);

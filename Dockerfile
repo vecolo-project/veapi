@@ -31,7 +31,8 @@ ENV JWT_SECRET ='mon-token-secret' \
     NODE_ENV='production'\
     SENDGRID_API_KEY=''\
     SENDGRID_SEND_EMAIL=''\
-    SENDGRID_REPLY_EMAIL=''
+    SENDGRID_REPLY_EMAIL=''\
+    RECAPTCHA_KEY=''
 
 
 EXPOSE 3000

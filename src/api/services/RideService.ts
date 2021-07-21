@@ -164,13 +164,11 @@ export default class RideService extends CRUD<Ride> {
     });
   }
 
-  async endRide(
+  private async checkRideIsCorrect(
     user: User,
     ride: Ride,
-    endStation: Station,
-    length: number,
-    updatedAt = new Date()
-  ): Promise<Ride> {
+    endStation: Station
+  ): Promise<Subscription> {
     ride = await this.getRepo().findOne({
       where: { id: ride.id, user: { id: user.id } },
       relations: ['startStation', 'endStation', 'bike'],
@@ -178,24 +176,55 @@ export default class RideService extends CRUD<Ride> {
     if (!ride) {
       throw new ErrorHandler(404, 'Erreur avec la course !');
     }
-    const bike = ride.bike;
-    const userSubscription: Subscription =
-      await this.subscriptionService.findLastFromUser(user.id);
+    const userSubscription: Subscription = await this.subscriptionService.findLastFromUser(
+      user.id
+    );
     if (!userSubscription) {
       throw new ErrorHandler(403, "Vous ne possedez pas d'abonnement actif");
     }
-    if (
-      (await this.bikeService
-        .getRepo()
-        .count({ where: { station: { id: endStation.id } } })) >=
-      endStation.bikeCapacity
-    ) {
+    const bikeInStation = await this.bikeService
+      .getRepo()
+      .count({ where: { station: { id: endStation.id } } });
+    if (bikeInStation >= endStation.bikeCapacity) {
       throw new ErrorHandler(403, 'La station ne peut plus accueillir de vélo');
     }
-    const plan: Plan = userSubscription.plan;
-    const minutes = differenceInMinutes(updatedAt, ride.createdAt);
-    const invoiceAmount =
-      Math.max(0, minutes - plan.freeMinutes) * plan.costPerMinute;
+    return userSubscription;
+  }
+
+  private async saveInvoiceForRide(
+    ride: Ride,
+    user: User,
+    subscription: Subscription,
+    currentDate: Date
+  ): Promise<void> {
+    const invoice: any = {
+      billingDate: currentDate,
+      amount: ride.invoiceAmount,
+      user: user,
+      subscription: subscription,
+    };
+    await this.invoiceService.create(invoice);
+  }
+
+  async endRide(
+    user: User,
+    ride: Ride,
+    endStation: Station,
+    length: number,
+    updatedAt = new Date()
+  ): Promise<Ride> {
+    const userSubscription = await this.checkRideIsCorrect(
+      user,
+      ride,
+      endStation
+    );
+    const plan = userSubscription.plan;
+    const minutes = differenceInMinutes(
+      new Date(updatedAt),
+      new Date(ride.createdAt)
+    );
+    const minutesPaid = Math.max(0, minutes - plan.freeMinutes);
+    const invoiceAmount = minutesPaid * plan.costPerMinute;
 
     ride.duration = minutes;
     ride.rideLength = length;
@@ -203,14 +232,9 @@ export default class RideService extends CRUD<Ride> {
     ride.invoiceAmount = invoiceAmount;
 
     ride = await this.update(ride.id, ride, updatedAt);
+    const bike = ride.bike;
 
-    const invoice: any = {
-      billingDate: new Date(),
-      amount: invoiceAmount,
-      user: user,
-      subscription: userSubscription,
-    };
-    await this.invoiceService.create(invoice);
+    await this.saveInvoiceForRide(ride, user, userSubscription, updatedAt);
     bike.station = endStation;
     await this.bikeService.update(bike.id, bike);
     return ride;
@@ -222,7 +246,7 @@ export default class RideService extends CRUD<Ride> {
     updatedAt = new Date()
   ): Promise<Ride> {
     const entity = await this.repo.findOne(id, {
-      relations: ['startStation', 'endStation'],
+      relations: ['startStation', 'endStation', 'bike'],
     });
     if (!entity) {
       throw new ErrorHandler(404, 'Not found');

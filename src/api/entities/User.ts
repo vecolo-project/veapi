@@ -139,4 +139,5 @@ export interface UserCreationProps {
   password: string;
   birthDate: Date;
   pseudo: string;
+  captcha?: string;
 }
