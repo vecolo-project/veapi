@@ -8,7 +8,6 @@ import StationService from './StationService';
 import { endOfMonth, setMonth, setYear, startOfMonth } from 'date-fns';
 import RideService from './RideService';
 import { Between } from 'typeorm';
-import { Station } from '../entities/Station';
 
 @Service()
 export default class StatisticsService {
@@ -99,33 +98,31 @@ export default class StatisticsService {
       .addSelect('SUM(ride.rideLength)', 'totalLength')
       .addSelect('SUM(ride.duration)', 'totalDuration')
       .where(
-        "ride.createdAt BETWEEN '" +
-          startDate.toISOString() +
-          "' AND '" +
-          endDate.toISOString() +
-          "'"
+        `ride.createdAt BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'`
       )
       .groupBy('day(ride.createdAt)')
       .getRawMany();
   }
 
-  async getActiveStation(): Promise<any> {
-    return (
-      await this.stationService.findAll({ limit: 99999, offset: 0 })
-    ).reduce(
-      (acumulator, station: Station) => {
-        return {
-          total:
-            acumulator.total + (station.stationMonitoring[0]?.isActive ? 1 : 0),
-          power:
-            acumulator.power +
-            (station.stationMonitoring[0]?.isActive
-              ? station.stationMonitoring[0]?.chargingPower || 0
-              : 0),
-        };
+  async getActiveStation(): Promise<{ total: number; power: number }> {
+    const allStation = await this.stationService.findAll({
+      limit: 99999,
+      offset: 0,
+    });
+    const activeStations = allStation.reduce(
+      (acc, station) => {
+        const stationIsActive = station.stationMonitoring[0]?.isActive;
+        const total = acc.total + Number(stationIsActive);
+        let additionnalPower = 0;
+        if (stationIsActive) {
+          additionnalPower = station.stationMonitoring[0]?.chargingPower;
+        }
+        const power = acc.power + additionnalPower;
+        return { power, total };
       },
       { total: 0, power: 0 }
     );
+    return activeStations;
   }
 
   async getBikes(): Promise<any> {
