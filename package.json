@@ -14,6 +14,7 @@
     "seed-bike": "ts-node -T commands/seed_bike.ts",
     "seed-bike-station": "ts-node -T commands/seed_bike_on_station.ts",
     "seed-ride": "ts-node -T commands/seed_ride.ts",
+    "seed-user": "ts-node -T commands/seed_user.ts",
     "semantic-release": "semantic-release",
     "generate-migration": "npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
     "generate-migration:prod": "cross-env NODE_ENV=production npx ts-node node_modules/.bin/typeorm migration:generate -n newMigration",
