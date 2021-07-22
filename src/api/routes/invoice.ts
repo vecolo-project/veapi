@@ -6,7 +6,6 @@ import { Container } from 'typedi';
 import BikeModelService from '../services/BikeModelService';
 import InvoiceService from '../services/InvoiceService';
 import { userRequest } from '../../types/userRequest';
-import * as fs from 'fs';
 
 const route = Router();
 const paramsRules = celebrate({
