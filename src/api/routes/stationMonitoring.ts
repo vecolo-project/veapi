@@ -40,8 +40,6 @@ route.post(
     }),
   }),
   async (req: StationRequest, res: Response, next: NextFunction) => {
-    const logger: Logger = Container.get('logger');
-    // logger.debug('Calling POST /station-monitoring/add-metric endpoint');
     try {
       const station: Station = req.currentStation;
       const stationMonitoringProps: StationMonitoringCreationProps = {

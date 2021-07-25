@@ -110,6 +110,7 @@ export default class SubscriptionService extends CRUD<Subscription> {
   }
 
   async createS(subscription: Subscription, user: User): Promise<Subscription> {
+    subscription = await this.create(subscription);
     const invoice: any = {
       billingDate: new Date(),
       amount: subscription.plan?.price,
@@ -117,6 +118,6 @@ export default class SubscriptionService extends CRUD<Subscription> {
       subscription: subscription,
     };
     await this.invoiceService.create(invoice);
-    return await this.create(subscription);
+    return subscription;
   }
 }

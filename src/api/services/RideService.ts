@@ -3,18 +3,17 @@ import CRUD, { getAllParams } from './CRUD';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Logger } from 'winston';
 import { Ride, RideRepository } from '../entities/Ride';
-import { Bike } from '../entities/Bike';
+import { Bike, BikeStatus } from '../entities/Bike';
 import { Station } from '../entities/Station';
 import { User } from '../entities/User';
 import SubscriptionService from './SubscriptionService';
 import InvoiceService from './InvoiceService';
 import { ErrorHandler } from '../../helpers/ErrorHandler';
-import { Plan } from '../entities/Plan';
-import { addHours, differenceInMinutes } from 'date-fns';
+import { differenceInMinutes } from 'date-fns';
 import { validate } from 'class-validator';
 import { Subscription } from '../entities/Subscription';
 import BikeService from './BikeService';
-import { ObjectLiteral } from 'typeorm';
+import { Not, ObjectLiteral } from 'typeorm';
 import _ from 'lodash';
 
 @Service()
@@ -91,12 +90,6 @@ export default class RideService extends CRUD<Ride> {
     param: getAllParams,
     searchQuery?: any
   ): Promise<[Ride[], number]> {
-    /*    return await this.rideRepo.findAndCount({
-              skip: param.offset,
-              take: param.limit,
-              relations: ['user', 'bike', 'startStation', 'endStation'],
-            });*/
-
     const result = await this.rideRepo
       .createQueryBuilder('ride')
       .leftJoinAndSelect('ride.user', 'user')
@@ -176,15 +169,17 @@ export default class RideService extends CRUD<Ride> {
     if (!ride) {
       throw new ErrorHandler(404, 'Erreur avec la course !');
     }
-    const userSubscription: Subscription = await this.subscriptionService.findLastFromUser(
-      user.id
-    );
+    const userSubscription: Subscription =
+      await this.subscriptionService.findLastFromUser(user.id);
     if (!userSubscription) {
       throw new ErrorHandler(403, "Vous ne possedez pas d'abonnement actif");
     }
-    const bikeInStation = await this.bikeService
-      .getRepo()
-      .count({ where: { station: { id: endStation.id } } });
+    const bikeInStation = await this.bikeService.getRepo().count({
+      where: {
+        station: { id: endStation.id },
+        status: Not(BikeStatus.IN_RIDE),
+      },
+    });
     if (bikeInStation >= endStation.bikeCapacity) {
       throw new ErrorHandler(403, 'La station ne peut plus accueillir de vélo');
     }

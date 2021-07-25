@@ -106,7 +106,7 @@ route.delete(
       );
       const id = Number.parseInt(req.params.id);
       const thread = await serviceBikeMaintenance.getAllFromBike(id);
-      const [rides, count] = await serviceRide.getAllRideFromBike(id, {
+      const [rides] = await serviceRide.getAllRideFromBike(id, {
         limit: 9999999,
         offset: 0,
       });
