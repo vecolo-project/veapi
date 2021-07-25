@@ -1,38 +1,27 @@
-<h1 align="center">Express TypeORM REST API Boilerplate</h1>
+<h1 align="center">VeAPI, staring Express TypeORM REST API</h1>
 
-<p align="center">
-  <a href="https://david-dm.org/bymi15/express-typeorm-rest-boilerplate" title="dependencies status">
-    <img src="https://david-dm.org/bymi15/express-typeorm-rest-boilerplate/status.svg?style=flat-square"/>
-  </a>
-  <a href="https://travis-ci.com/github/bymi15/express-typeorm-rest-boilerplate">
-    <img src="https://api.travis-ci.com/bymi15/express-typeorm-rest-boilerplate.svg?branch=main" alt="travis" />
-  </a>
-  <a href="https://stackshare.io/bymi15/express-typeorm-rest-boilerplate">
-    <img src="http://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" alt="stackshare" />
-  </a>
-  <a href="https://www.npmjs.com/package/express-typeorm-rest-boilerplate">
-    <img src="https://img.shields.io/npm/v/express-typeorm-rest-boilerplate?color=brightgreen&style=flat-squaret" alt="npm" />
-  </a>
-</p>
+<!-- toc -->
 
-<p align="center">
-  <b>Awesome boilerplate code to get started with building RESTful API Services!</b></br>
-  <span><a href="https://www.typescriptlang.org/">Typescript</a> with <a href="https://nodejs.org/">NodeJS</a> and <a href="https://expressjs.com/">Express</a> as well as <a href="https://www.mongodb.com/">MongoDB</a> integration with <a href="https://github.com/typeorm/typeorm">TypeORM</a></br>
-  <b>JSON Web Tokens (JWT)</b> based User Authentication,</span></br>
-  <a href="https://github.com/typestack/typedi">TypeDI</a><span> dependency injections, testing with <a href="https://jestjs.io/">Jest</a>, and a bunch more.</span></br>
-  <sub>Made with ❤️ by <a href="https://github.com/bymi15">Brian Min</a></sub>
-</p>
+  * [Syllabus](#syllabus)
+  * [Features](#features)
+- [Getting Started](#getting-started)
+  * [Step 1: Set up the Development Environment](#step-1-set-up-the-development-environment)
+  * [Step 2: Create a new project](#step-2-create-a-new-project)
+  * [Step 3: Serve your application](#step-3-serve-your-application)
+- [Scripts and Tasks](#scripts-and-tasks)
+  * [Install](#install)
+  * [Linting](#linting)
+  * [Running the app in development](#running-the-app-in-development)
+  * [Building and running the app in production](#building-and-running-the-app-in-production)
+- [API Routes](#api-routes)
+- [Project Structure](#project-structure)
+- [Logging](#logging)
 
-<br />
+<!-- tocstop -->
 
-## Why?
+### Syllabus
 
-The main reason I decided to start this project is to provide a boilerplate for the NodeJS, Express, Typescript, TypeORM, MongoDB stack.
-Also with TypeORM, this boilerplate code can easily be modified to use MySQL, PostGreSQL, and many more.
-Tedious setting up of project structure, logging, testing, env and eslint is all done for you!
-Now you can focus on actually implementing the core functionalities and not spending hours setting up and configuring your project.
-
-Try it out and feel free to raise any issues or create pull requests if you would like to contribute!
+ [Veapi.pdf](./Veapi.pdf) 
 
 ### Features
 
@@ -95,16 +84,6 @@ npm run dev
 - Run code syntax and format checking using `npm run lint` which runs eslint.
 - Automatically fix lint errors with `npm run lint:fix`.
 
-### Running MongoDB locally
-
-- Run `npm run mongodb` to start a local MongoDB server with it's data stored in `.mongodb` in the root directory.
-- This is very useful for unit / integration testing.
-- It's always a good idea to use a separate database for testing.
-
-### Tests
-
-- Run unit tests using `npm run test` (for Windows users) or `npm run test:unix` (for Mac and Linux users).
-
 ### Running the app in development
 
 - Run `npm run dev` to start nodemon with ts-node.
@@ -151,7 +130,3 @@ The route prefix is `/api` by default, but you can change this in the .env file.
 ## Logging
 
 For logging we use [winston](https://github.com/winstonjs/winston).
-
-## License
-
-[MIT](/LICENSE)
